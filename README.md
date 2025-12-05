@@ -42,6 +42,11 @@ npm install
 npm run dev  # 默认 http://localhost:5173，API 默认 http://localhost:9000
 ```
 
+##前后端地址
+
+- 后端：http://0.0.0.0:9000（已启用统一返回格式）
+- 前端：http://localhost:5173（默认 API 指向 9000，可在 .env 调整）
+
 ## 接口速览
 - 登录：`POST /api/v1/admin/auth/login` -> `{"code":1,"data":{"access_token":...}}`
 - 管理端 CRUD：`/api/v1/admin/roles|apps|channels|message-types|channel-message-types|templates|subscriptions|users-mapping`（分页 `page/page_size`）
