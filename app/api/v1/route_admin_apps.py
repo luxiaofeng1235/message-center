@@ -9,6 +9,7 @@ from app.api.deps import get_current_admin, get_db
 from app.schemas.app import AppCreate, AppOut, AppUpdate
 from app.schemas.common import Page
 from app.services.api.app_service import AppService
+from app.core.response import success
 
 router = APIRouter(prefix="/admin/apps")
 
@@ -21,7 +22,7 @@ async def list_apps(
     _: object = Depends(get_current_admin),
 ) -> Page[AppOut]:
     service = AppService(db)
-    return await service.list_apps(page, page_size)
+    return success(await service.list_apps(page, page_size))
 
 
 @router.post("/", response_model=AppOut)
@@ -31,7 +32,7 @@ async def create_app(
     _: object = Depends(get_current_admin),
 ) -> AppOut:
     service = AppService(db)
-    return await service.create_app(payload)
+    return success(await service.create_app(payload))
 
 
 @router.put("/{app_id}", response_model=AppOut)
@@ -42,4 +43,4 @@ async def update_app(
     _: object = Depends(get_current_admin),
 ) -> AppOut:
     service = AppService(db)
-    return await service.update_app(app_id, payload)
+    return success(await service.update_app(app_id, payload))

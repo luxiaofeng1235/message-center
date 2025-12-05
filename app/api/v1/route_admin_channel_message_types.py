@@ -13,6 +13,7 @@ from app.schemas.channel_message_type import (
 )
 from app.schemas.common import Page
 from app.services.admin.channel_message_type_service import ChannelMessageTypeService
+from app.core.response import success
 
 router = APIRouter(prefix="/admin/channel-message-types")
 
@@ -26,7 +27,7 @@ async def list_items(
     _: object = Depends(get_current_admin),
 ) -> Page[ChannelMessageTypeOut]:
     service = ChannelMessageTypeService(db)
-    return await service.list_items(page, page_size, channel_id=channel_id)
+    return success(await service.list_items(page, page_size, channel_id=channel_id))
 
 
 @router.post("/", response_model=ChannelMessageTypeOut)
@@ -36,7 +37,7 @@ async def create_item(
     _: object = Depends(get_current_admin),
 ) -> ChannelMessageTypeOut:
     service = ChannelMessageTypeService(db)
-    return await service.create_item(payload)
+    return success(await service.create_item(payload))
 
 
 @router.put("/{item_id}", response_model=ChannelMessageTypeOut)
@@ -47,4 +48,4 @@ async def update_item(
     _: object = Depends(get_current_admin),
 ) -> ChannelMessageTypeOut:
     service = ChannelMessageTypeService(db)
-    return await service.update_item(item_id, payload)
+    return success(await service.update_item(item_id, payload))
