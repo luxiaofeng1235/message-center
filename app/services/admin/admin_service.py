@@ -37,7 +37,9 @@ class AdminService:
         items_out = [AdminOut.model_validate(i, from_attributes=True) for i in items]
         return Page(meta=PageMeta(total=total or 0, page=page, page_size=page_size), items=items_out)
 
-    async def create_admin(self, data: AdminCreate) -> AdminOut:
+    async def create_admin(self, data: AdminCreate, current_admin: AdminUser) -> AdminOut:
+        if not current_admin.is_super:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="仅超级管理员可创建账号")
         exists = await self.db.scalar(select(AdminUser).where(AdminUser.username == data.username))
         if exists:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Username exists")
@@ -54,11 +56,15 @@ class AdminService:
         await self.db.refresh(admin)
         return AdminOut.model_validate(admin, from_attributes=True)
 
-    async def update_admin(self, admin_id: int, data: AdminUpdate) -> AdminOut:
+    async def update_admin(self, admin_id: int, data: AdminUpdate, current_admin: AdminUser) -> AdminOut:
         result = await self.db.execute(select(AdminUser).where(AdminUser.id == admin_id))
         admin = result.scalar_one_or_none()
         if not admin:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Admin not found")
+        if admin.id == current_admin.id and (data.is_super is not None or data.is_active is not None):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="不能修改自身的启用/超管状态")
+        if (data.is_super is not None or data.is_active is not None) and not current_admin.is_super:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="仅超级管理员可修改启用/超管状态")
         if data.display_name is not None:
             admin.display_name = data.display_name
         if data.phone is not None:
@@ -74,7 +80,11 @@ class AdminService:
         await self.db.refresh(admin)
         return AdminOut.model_validate(admin, from_attributes=True)
 
-    async def deactivate_admin(self, admin_id: int) -> None:
+    async def deactivate_admin(self, admin_id: int, current_admin: AdminUser) -> None:
+        if admin_id == current_admin.id:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="不能禁用自己")
+        if not current_admin.is_super:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="仅超级管理员可禁用账号")
         await self.db.execute(
             update(AdminUser).where(AdminUser.id == admin_id).values(is_active=False, updated_at=datetime.utcnow())
         )

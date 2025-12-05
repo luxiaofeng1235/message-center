@@ -29,10 +29,10 @@ async def list_admins(
 async def create_admin(
     payload: AdminCreate,
     db: AsyncSession = Depends(get_db),
-    _: object = Depends(get_current_admin),
+    current_admin=Depends(get_current_admin),
 ) -> AdminOut:
     service = AdminService(db)
-    return success(await service.create_admin(payload))
+    return success(await service.create_admin(payload, current_admin))
 
 
 @router.put("/{admin_id}", response_model=None)
@@ -40,18 +40,18 @@ async def update_admin(
     admin_id: int,
     payload: AdminUpdate,
     db: AsyncSession = Depends(get_db),
-    _: object = Depends(get_current_admin),
+    current_admin=Depends(get_current_admin),
 ) -> AdminOut:
     service = AdminService(db)
-    return success(await service.update_admin(admin_id, payload))
+    return success(await service.update_admin(admin_id, payload, current_admin))
 
 
 @router.delete("/{admin_id}")
 async def deactivate_admin(
     admin_id: int,
     db: AsyncSession = Depends(get_db),
-    _: object = Depends(get_current_admin),
+    current_admin=Depends(get_current_admin),
 ) -> dict[str, str]:
     service = AdminService(db)
-    await service.deactivate_admin(admin_id)
+    await service.deactivate_admin(admin_id, current_admin)
     return success({"status": "ok"})
