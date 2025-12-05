@@ -74,9 +74,9 @@ class AdminService:
         if data.is_active is not None:
             admin.is_active = data.is_active
         if data.password:
-            if admin.id == current_admin.id:
-                if not data.old_password or not verify_password(data.old_password, admin.password_hash):
-                    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="旧密码错误")
+            # 任何修改密码的操作都需提供原密码并校验
+            if not data.old_password or not verify_password(data.old_password, admin.password_hash):
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="旧密码错误")
             admin.password_hash = get_password_hash(data.password)
         admin.updated_at = datetime.utcnow()
         await self.db.commit()
