@@ -2,11 +2,11 @@
   <el-dialog v-model="visible" title="个人资料" width="520px">
     <el-tabs v-model="activeTab">
       <el-tab-pane label="基本信息" name="info">
-        <el-form :model="formInfo" label-width="100px">
+        <el-form ref="formRef" :model="formInfo" :rules="rulesInfo" label-width="100px">
           <el-form-item label="用户名">
             <el-input v-model="formInfo.username" disabled />
           </el-form-item>
-          <el-form-item label="显示名称">
+          <el-form-item label="显示名称" prop="display_name">
             <el-input v-model="formInfo.display_name" />
           </el-form-item>
           <el-form-item label="手机号">
@@ -19,11 +19,11 @@
         </div>
       </el-tab-pane>
       <el-tab-pane label="修改密码" name="pwd">
-        <el-form :model="formPwd" label-width="100px">
+        <el-form ref="pwdRef" :model="formPwd" :rules="rulesPwd" label-width="100px">
           <el-form-item label="旧密码">
             <el-input v-model="formPwd.old_password" type="password" />
           </el-form-item>
-          <el-form-item label="新密码">
+          <el-form-item label="新密码" prop="new_password">
             <el-input v-model="formPwd.new_password" type="password" />
           </el-form-item>
         </el-form>

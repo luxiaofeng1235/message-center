@@ -26,7 +26,7 @@
         <el-input v-model="form.message_key" />
       </el-form-item>
       <el-form-item label="X-App-Secret" prop="app_secret">
-        <el-input v-model="appSecret" />
+        <el-input v-model="form.app_secret" />
       </el-form-item>
       <el-button type="primary" @click="send" :loading="loading">发送</el-button>
     </el-form>
@@ -50,9 +50,9 @@ const form = reactive({
   content: '',
   priority: 0,
   message_key: '',
+  app_secret: '',
 })
 const payloadStr = ref('')
-const appSecret = ref('')
 const result = ref(null)
 const loading = ref(false)
 const formRef = ref()
@@ -69,7 +69,7 @@ const send = async () => {
   try {
     await formRef.value.validate()
     const payload = { ...form, payload: payloadStr.value ? JSON.parse(payloadStr.value) : null }
-    const res = await sendMessage(payload, appSecret.value)
+    const res = await sendMessage(payload, form.app_secret)
     result.value = res
     ElMessage.success('发送成功')
   } catch (err) {
