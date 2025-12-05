@@ -14,7 +14,7 @@ from app.core.response import success
 router = APIRouter(prefix="/admin/users")
 
 
-@router.get("/", response_model=None)
+@router.get("", response_model=None)
 async def list_admins(
     page: int = 1,
     page_size: int = 20,
@@ -25,7 +25,7 @@ async def list_admins(
     return success(await service.list_admins(page, page_size))
 
 
-@router.post("/", response_model=None)
+@router.post("", response_model=None)
 async def create_admin(
     payload: AdminCreate,
     db: AsyncSession = Depends(get_db),
