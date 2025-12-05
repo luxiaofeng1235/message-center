@@ -106,6 +106,8 @@ const saveInfo = async () => {
     ElMessage.success('保存成功')
     close()
   } catch (err) {
+    // 表单校验失败不再弹“修改失败”
+    if (!err?.response && !err?.msg && err?.name === 'Error') return
     ElMessage.error(err.msg || err.response?.data?.detail || '保存失败')
   }
 }
@@ -121,6 +123,8 @@ const savePwd = async () => {
     formPwd.value.new_password = ''
     close()
   } catch (err) {
+    // 表单校验失败不再弹“修改失败”
+    if (!err?.response && !err?.msg && err?.name === 'Error') return
     ElMessage.error(err.msg || err.response?.data?.detail || '修改失败')
   }
 }
