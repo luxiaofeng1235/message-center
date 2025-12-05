@@ -14,7 +14,7 @@ from app.core.response import success
 router = APIRouter(prefix="/admin/subscriptions")
 
 
-@router.get("/", response_model=Page[SubscriptionOut])
+@router.get("/", response_model=None)
 async def list_subscriptions(
     page: int = 1,
     page_size: int = 20,

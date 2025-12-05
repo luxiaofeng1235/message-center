@@ -14,7 +14,7 @@ from app.core.response import success
 router = APIRouter(prefix="/admin/channels")
 
 
-@router.get("/", response_model=Page[ChannelOut])
+@router.get("/", response_model=None)
 async def list_channels(
     page: int = 1,
     page_size: int = 20,

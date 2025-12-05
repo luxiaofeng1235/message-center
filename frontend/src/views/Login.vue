@@ -35,7 +35,7 @@ const form = reactive({
 const onSubmit = async () => {
   loading.value = true
   try {
-    const { data } = await login(form)
+    const data = await login(form)
     auth.setAuth(data.access_token, { username: form.username })
     router.push('/')
   } catch (err) {

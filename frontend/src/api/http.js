@@ -2,7 +2,7 @@ import axios from 'axios'
 import { useAuthStore } from '../stores/auth'
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:9000',
   timeout: 10000,
 })
 
@@ -15,7 +15,16 @@ api.interceptors.request.use((config) => {
 })
 
 api.interceptors.response.use(
-  (resp) => resp,
+  (resp) => {
+    const data = resp.data
+    if (data && typeof data === 'object' && 'code' in data) {
+      if (data.code === 1) {
+        return data.data
+      }
+      return Promise.reject(data)
+    }
+    return resp
+  },
   (error) => {
     if (error.response && error.response.status === 401) {
       const auth = useAuthStore()

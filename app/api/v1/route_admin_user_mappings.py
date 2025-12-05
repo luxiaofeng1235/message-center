@@ -14,7 +14,7 @@ from app.core.response import success
 router = APIRouter(prefix="/admin/users-mapping")
 
 
-@router.get("/", response_model=Page[UserOut])
+@router.get("/", response_model=None)
 async def list_users(
     page: int = 1,
     page_size: int = 20,
