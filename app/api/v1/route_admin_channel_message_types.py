@@ -18,7 +18,7 @@ from app.core.response import success
 router = APIRouter(prefix="/admin/channel-message-types")
 
 
-@router.get("/", response_model=None)
+@router.get("", response_model=None)
 async def list_items(
     page: int = 1,
     page_size: int = 20,
@@ -30,7 +30,7 @@ async def list_items(
     return success(await service.list_items(page, page_size, channel_id=channel_id))
 
 
-@router.post("/", response_model=None)
+@router.post("", response_model=None)
 async def create_item(
     payload: ChannelMessageTypeCreate,
     db: AsyncSession = Depends(get_db),
