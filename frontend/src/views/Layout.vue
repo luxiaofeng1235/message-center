@@ -11,12 +11,15 @@
         <el-menu-item index="/message-types">消息类型</el-menu-item>
         <el-menu-item index="/channel-message-types">通道消息类型</el-menu-item>
         <el-menu-item index="/templates">模板</el-menu-item>
-        <el-menu-item index="/subscriptions">订阅</el-menu-item>
-        <el-menu-item index="/users">业务用户</el-menu-item>
-        <el-menu-item index="/messages">消息列表</el-menu-item>
-        <el-menu-item index="/deliveries">投递记录</el-menu-item>
-      </el-menu>
-    </el-aside>
+      <el-menu-item index="/subscriptions">订阅</el-menu-item>
+      <el-menu-item index="/users">业务用户</el-menu-item>
+      <el-menu-item index="/messages">消息列表</el-menu-item>
+      <el-menu-item index="/deliveries">投递记录</el-menu-item>
+      <el-menu-item index="/send-message">发送消息</el-menu-item>
+      <el-menu-item index="/instances">实例心跳</el-menu-item>
+      <el-menu-item index="/ws-tester">WS 测试</el-menu-item>
+    </el-menu>
+  </el-aside>
     <el-container>
       <el-header class="header">
         <div class="title">后台管理</div>

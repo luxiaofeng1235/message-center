@@ -14,6 +14,9 @@ import Subscriptions from '../views/Subscriptions.vue'
 import UsersMapping from '../views/UsersMapping.vue'
 import Messages from '../views/Messages.vue'
 import Deliveries from '../views/Deliveries.vue'
+import Instances from '../views/Instances.vue'
+import WsTester from '../views/WsTester.vue'
+import SendMessage from '../views/SendMessage.vue'
 
 const routes = [
   { path: '/login', name: 'login', component: Login },
@@ -33,6 +36,9 @@ const routes = [
       { path: 'users', name: 'users', component: UsersMapping },
       { path: 'messages', name: 'messages', component: Messages },
       { path: 'deliveries', name: 'deliveries', component: Deliveries },
+      { path: 'instances', name: 'instances', component: Instances },
+      { path: 'ws-tester', name: 'ws-tester', component: WsTester },
+      { path: 'send-message', name: 'send-message', component: SendMessage },
     ],
   },
 ]
