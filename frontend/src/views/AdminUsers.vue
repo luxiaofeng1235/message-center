@@ -129,11 +129,8 @@ const save = async () => {
     visible.value = false
     fetchData()
   } catch (err) {
-    if (err?.msg || err?.detail) {
-      ElMessage.error(err.msg || err.detail)
-    } else {
-      ElMessage.error(err.response?.data?.detail || err.message || '保存失败')
-    }
+    if (!err?.response && !err?.msg && err?.name === 'Error') return
+    ElMessage.error(err.msg || err.response?.data?.detail || err.message || '保存失败')
   }
 }
 
