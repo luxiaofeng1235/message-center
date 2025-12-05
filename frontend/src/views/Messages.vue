@@ -4,8 +4,10 @@
       <el-form-item label="AppID">
         <el-input v-model="filters.app_id" style="width: 120px" />
       </el-form-item>
-      <el-form-item label="通道ID">
-        <el-input v-model="filters.channel_id" style="width: 120px" />
+      <el-form-item label="通道">
+        <el-select v-model="filters.channel_id" clearable placeholder="全部通道" style="width: 200px">
+          <el-option v-for="c in channelOptions" :key="c.id" :label="c.name" :value="c.id" />
+        </el-select>
       </el-form-item>
       <el-button type="primary" @click="fetchData">查询</el-button>
     </el-form>
@@ -32,11 +34,12 @@
 
 <script setup>
 import { reactive, ref, onMounted } from 'vue'
-import { listMessages } from '../api'
+import { listMessages, listChannels } from '../api'
 
 const items = ref([])
 const meta = reactive({ total: 0, page: 1, page_size: 20 })
 const filters = reactive({ app_id: '', channel_id: '' })
+const channelOptions = ref([])
 
 const fetchData = async () => {
   const params = { page: meta.page, page_size: meta.page_size }
@@ -52,7 +55,15 @@ const pageChange = (p) => {
   fetchData()
 }
 
-onMounted(fetchData)
+const fetchChannels = async () => {
+  const res = await listChannels({ page: 1, page_size: 200 })
+  channelOptions.value = res.items || []
+}
+
+onMounted(() => {
+  fetchChannels()
+  fetchData()
+})
 </script>
 
 <style scoped>
