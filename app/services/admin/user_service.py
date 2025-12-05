@@ -33,7 +33,7 @@ class UserService:
         items_out = [UserOut.model_validate(i, from_attributes=True) for i in items]
         return Page(meta=PageMeta(total=total or 0, page=page, page_size=page_size), items=items_out)
 
-    async def create_user(self, data: UserCreate) -> User:
+    async def create_user(self, data: UserCreate) -> UserOut:
         exists = await self.db.scalar(
             select(User).where(and_(User.app_id == data.app_id, User.external_user_id == data.external_user_id))
         )
@@ -43,4 +43,4 @@ class UserService:
         self.db.add(user)
         await self.db.commit()
         await self.db.refresh(user)
-        return user
+        return UserOut.model_validate(user, from_attributes=True)

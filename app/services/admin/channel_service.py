@@ -33,7 +33,7 @@ class ChannelService:
         items_out = [ChannelOut.model_validate(i, from_attributes=True) for i in items]
         return Page(meta=PageMeta(total=total or 0, page=page, page_size=page_size), items=items_out)
 
-    async def create_channel(self, data: ChannelCreate) -> Channel:
+    async def create_channel(self, data: ChannelCreate) -> ChannelOut:
         exists = await self.db.scalar(
             select(Channel).where(and_(Channel.app_id == data.app_id, Channel.channel_key == data.channel_key))
         )
@@ -49,9 +49,9 @@ class ChannelService:
         self.db.add(channel)
         await self.db.commit()
         await self.db.refresh(channel)
-        return channel
+        return ChannelOut.model_validate(channel, from_attributes=True)
 
-    async def update_channel(self, channel_id: int, data: ChannelUpdate) -> Channel:
+    async def update_channel(self, channel_id: int, data: ChannelUpdate) -> ChannelOut:
         result = await self.db.execute(select(Channel).where(Channel.id == channel_id))
         channel = result.scalar_one_or_none()
         if not channel:
@@ -64,4 +64,4 @@ class ChannelService:
             channel.is_active = data.is_active
         await self.db.commit()
         await self.db.refresh(channel)
-        return channel
+        return ChannelOut.model_validate(channel, from_attributes=True)

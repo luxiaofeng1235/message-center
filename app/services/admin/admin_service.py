@@ -37,7 +37,7 @@ class AdminService:
         items_out = [AdminOut.model_validate(i, from_attributes=True) for i in items]
         return Page(meta=PageMeta(total=total or 0, page=page, page_size=page_size), items=items_out)
 
-    async def create_admin(self, data: AdminCreate) -> AdminUser:
+    async def create_admin(self, data: AdminCreate) -> AdminOut:
         exists = await self.db.scalar(select(AdminUser).where(AdminUser.username == data.username))
         if exists:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Username exists")
@@ -52,9 +52,9 @@ class AdminService:
         self.db.add(admin)
         await self.db.commit()
         await self.db.refresh(admin)
-        return admin
+        return AdminOut.model_validate(admin, from_attributes=True)
 
-    async def update_admin(self, admin_id: int, data: AdminUpdate) -> AdminUser:
+    async def update_admin(self, admin_id: int, data: AdminUpdate) -> AdminOut:
         result = await self.db.execute(select(AdminUser).where(AdminUser.id == admin_id))
         admin = result.scalar_one_or_none()
         if not admin:
@@ -72,7 +72,7 @@ class AdminService:
         admin.updated_at = datetime.utcnow()
         await self.db.commit()
         await self.db.refresh(admin)
-        return admin
+        return AdminOut.model_validate(admin, from_attributes=True)
 
     async def deactivate_admin(self, admin_id: int) -> None:
         await self.db.execute(
@@ -97,7 +97,7 @@ class RoleService:
         items_out = [RoleOut.model_validate(i, from_attributes=True) for i in items]
         return Page(meta=PageMeta(total=total or 0, page=page, page_size=page_size), items=items_out)
 
-    async def create_role(self, data: RoleCreate) -> AdminRole:
+    async def create_role(self, data: RoleCreate) -> RoleOut:
         exists = await self.db.scalar(select(AdminRole).where(AdminRole.code == data.code))
         if exists:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Role code exists")
@@ -105,9 +105,9 @@ class RoleService:
         self.db.add(role)
         await self.db.commit()
         await self.db.refresh(role)
-        return role
+        return RoleOut.model_validate(role, from_attributes=True)
 
-    async def update_role(self, role_id: int, data: RoleUpdate) -> AdminRole:
+    async def update_role(self, role_id: int, data: RoleUpdate) -> RoleOut:
         result = await self.db.execute(select(AdminRole).where(AdminRole.id == role_id))
         role = result.scalar_one_or_none()
         if not role:
@@ -118,4 +118,4 @@ class RoleService:
             role.description = data.description
         await self.db.commit()
         await self.db.refresh(role)
-        return role
+        return RoleOut.model_validate(role, from_attributes=True)

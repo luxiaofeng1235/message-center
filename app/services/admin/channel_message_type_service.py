@@ -39,7 +39,7 @@ class ChannelMessageTypeService:
         items_out = [ChannelMessageTypeOut.model_validate(i, from_attributes=True) for i in items]
         return Page(meta=PageMeta(total=total or 0, page=page, page_size=page_size), items=items_out)
 
-    async def create_item(self, data: ChannelMessageTypeCreate) -> ChannelMessageType:
+    async def create_item(self, data: ChannelMessageTypeCreate) -> ChannelMessageTypeOut:
         exists = await self.db.scalar(
             select(ChannelMessageType).where(
                 and_(
@@ -60,9 +60,9 @@ class ChannelMessageTypeService:
         self.db.add(item)
         await self.db.commit()
         await self.db.refresh(item)
-        return item
+        return ChannelMessageTypeOut.model_validate(item, from_attributes=True)
 
-    async def update_item(self, item_id: int, data: ChannelMessageTypeUpdate) -> ChannelMessageType:
+    async def update_item(self, item_id: int, data: ChannelMessageTypeUpdate) -> ChannelMessageTypeOut:
         result = await self.db.execute(select(ChannelMessageType).where(ChannelMessageType.id == item_id))
         item = result.scalar_one_or_none()
         if not item:
@@ -75,4 +75,4 @@ class ChannelMessageTypeService:
             item.is_active = data.is_active
         await self.db.commit()
         await self.db.refresh(item)
-        return item
+        return ChannelMessageTypeOut.model_validate(item, from_attributes=True)

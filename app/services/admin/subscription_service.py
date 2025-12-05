@@ -48,7 +48,7 @@ class SubscriptionService:
         items_out = [SubscriptionOut.model_validate(i, from_attributes=True) for i in items]
         return Page(meta=PageMeta(total=total or 0, page=page, page_size=page_size), items=items_out)
 
-    async def create_subscription(self, data: SubscriptionCreate) -> Subscription:
+    async def create_subscription(self, data: SubscriptionCreate) -> SubscriptionOut:
         # 校验通道
         channel = await self.db.scalar(select(Channel).where(Channel.id == data.channel_id))
         if not channel or not channel.is_active:
@@ -90,9 +90,9 @@ class SubscriptionService:
         self.db.add(sub)
         await self.db.commit()
         await self.db.refresh(sub)
-        return sub
+        return SubscriptionOut.model_validate(sub, from_attributes=True)
 
-    async def update_subscription(self, subscription_id: int, data: SubscriptionUpdate) -> Subscription:
+    async def update_subscription(self, subscription_id: int, data: SubscriptionUpdate) -> SubscriptionOut:
         result = await self.db.execute(select(Subscription).where(Subscription.id == subscription_id))
         sub = result.scalar_one_or_none()
         if not sub:
@@ -103,4 +103,4 @@ class SubscriptionService:
             sub.source = data.source
         await self.db.commit()
         await self.db.refresh(sub)
-        return sub
+        return SubscriptionOut.model_validate(sub, from_attributes=True)

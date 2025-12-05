@@ -5,7 +5,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.app import App
-from app.schemas.app import AppCreate, AppUpdate
+from app.schemas.app import AppCreate, AppOut, AppUpdate
 from app.schemas.common import Page, PageMeta
 from app.utils.common import paginate_params
 
@@ -16,14 +16,15 @@ class AppService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def list_apps(self, page: int, page_size: int) -> Page[App]:
+    async def list_apps(self, page: int, page_size: int) -> Page[AppOut]:
         offset, limit = paginate_params(page, page_size)
         total = await self.db.scalar(select(func.count()).select_from(App))
         result = await self.db.execute(select(App).order_by(App.id.desc()).offset(offset).limit(limit))
         items: Sequence[App] = result.scalars().all()
-        return Page(meta=PageMeta(total=total or 0, page=page, page_size=page_size), items=items)
+        items_out = [AppOut.model_validate(i, from_attributes=True) for i in items]
+        return Page(meta=PageMeta(total=total or 0, page=page, page_size=page_size), items=items_out)
 
-    async def create_app(self, data: AppCreate) -> App:
+    async def create_app(self, data: AppCreate) -> AppOut:
         exists = await self.db.scalar(select(App).where(App.code == data.code))
         if exists:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="App code exists")
@@ -37,9 +38,9 @@ class AppService:
         self.db.add(app)
         await self.db.commit()
         await self.db.refresh(app)
-        return app
+        return AppOut.model_validate(app, from_attributes=True)
 
-    async def update_app(self, app_id: int, data: AppUpdate) -> App:
+    async def update_app(self, app_id: int, data: AppUpdate) -> AppOut:
         result = await self.db.execute(select(App).where(App.id == app_id))
         app = result.scalar_one_or_none()
         if not app:
@@ -54,7 +55,7 @@ class AppService:
             app.is_active = data.is_active
         await self.db.commit()
         await self.db.refresh(app)
-        return app
+        return AppOut.model_validate(app, from_attributes=True)
 
     async def verify_app_secret(self, app_id: int, secret: str) -> App:
         result = await self.db.execute(select(App).where(App.id == app_id))
