@@ -53,9 +53,9 @@ const form = reactive({
 })
 
 const fetchData = async () => {
-  const { data } = await listUsers({ page: meta.page, page_size: meta.page_size })
-  items.value = data.items
-  Object.assign(meta, data.meta)
+  const res = await listUsers({ page: meta.page, page_size: meta.page_size })
+  items.value = res.items
+  Object.assign(meta, res.meta)
 }
 
 const openForm = (row = null) => {

@@ -42,9 +42,9 @@ const fetchData = async () => {
   const params = { page: meta.page, page_size: meta.page_size }
   if (filters.app_id) params.app_id = filters.app_id
   if (filters.channel_id) params.channel_id = filters.channel_id
-  const { data } = await listMessages(params)
-  items.value = data.items
-  Object.assign(meta, data.meta)
+  const res = await listMessages(params)
+  items.value = res.items
+  Object.assign(meta, res.meta)
 }
 
 const pageChange = (p) => {
