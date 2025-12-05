@@ -14,7 +14,7 @@ from app.core.response import success
 router = APIRouter(prefix="/admin/templates")
 
 
-@router.get("/", response_model=Page[MessageTemplateOut])
+@router.get("/", response_model=None)
 async def list_templates(
     page: int = 1,
     page_size: int = 20,

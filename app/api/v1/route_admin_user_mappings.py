@@ -9,6 +9,7 @@ from app.api.deps import get_current_admin, get_db
 from app.schemas.common import Page
 from app.schemas.user import UserCreate, UserOut
 from app.services.admin.user_service import UserService
+from app.core.response import success
 
 router = APIRouter(prefix="/admin/users-mapping")
 
@@ -22,7 +23,7 @@ async def list_users(
     _: object = Depends(get_current_admin),
 ) -> Page[UserOut]:
     service = UserService(db)
-    return await service.list_users(page, page_size, app_id=app_id)
+    return success(await service.list_users(page, page_size, app_id=app_id))
 
 
 @router.post("/", response_model=UserOut)
@@ -32,4 +33,4 @@ async def create_user(
     _: object = Depends(get_current_admin),
 ) -> UserOut:
     service = UserService(db)
-    return await service.create_user(payload)
+    return success(await service.create_user(payload))

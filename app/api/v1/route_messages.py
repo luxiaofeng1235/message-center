@@ -12,6 +12,7 @@ from app.schemas.common import Page
 from app.schemas.message import MessageCreate, MessageOut, MessageSendResponse
 from app.schemas.message_delivery import MessageDeliveryOut
 from app.services.api.message_service import MessageService
+from app.core.response import success
 
 router = APIRouter(prefix="/messages")
 
@@ -23,7 +24,7 @@ async def send_message(
     app_secret: str | None = Header(default=None, convert_underscores=False, alias="X-App-Secret"),
 ) -> MessageSendResponse:
     service = MessageService(db)
-    return await service.send_message(payload, app_secret=app_secret)
+    return success(await service.send_message(payload, app_secret=app_secret))
 
 
 @router.get("/", response_model=Page[MessageOut])
@@ -35,7 +36,7 @@ async def list_messages(
     db: AsyncSession = Depends(get_db),
 ) -> Page[Message]:
     service = MessageService(db)
-    return await service.list_messages(page, page_size, app_id=app_id, channel_id=channel_id)
+    return success(await service.list_messages(page, page_size, app_id=app_id, channel_id=channel_id))
 
 
 @router.get("/deliveries", response_model=Page[MessageDeliveryOut])
@@ -47,4 +48,4 @@ async def list_deliveries(
     db: AsyncSession = Depends(get_db),
 ) -> Page[MessageDelivery]:
     service = MessageService(db)
-    return await service.list_deliveries(page, page_size, user_id=user_id, status=status)
+    return success(await service.list_deliveries(page, page_size, user_id=user_id, status=status))
