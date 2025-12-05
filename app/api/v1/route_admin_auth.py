@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_db
@@ -11,6 +11,7 @@ router = APIRouter(prefix="/admin/auth")
 
 
 @router.post("/login", response_model=Token)
-async def login(payload: AdminLogin, db: AsyncSession = Depends(get_db)) -> Token:
+async def login(payload: AdminLogin, request: Request, db: AsyncSession = Depends(get_db)) -> Token:
     service = AuthService(AdminService(db))
-    return await service.login(payload.username, payload.password)
+    client_ip = request.client.host if request.client else None
+    return await service.login(payload.username, payload.password, request_ip=client_ip)
