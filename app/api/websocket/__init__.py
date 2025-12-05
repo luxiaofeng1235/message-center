@@ -6,11 +6,13 @@ import json
 from datetime import datetime
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.websocket.connection_manager import manager
 from app.db.session import async_session
 from app.models.client_connection import ClientConnection
+from app.models.message import Message
 from app.models.message_delivery import MessageDelivery
 
 router = APIRouter()
@@ -44,6 +46,33 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
         )
         db.add(conn)
         await db.commit()
+        # 补发未送达/失败的投递
+        pending = await db.execute(
+            select(MessageDelivery, Message)
+            .join(Message, Message.id == MessageDelivery.message_id)
+            .where(MessageDelivery.user_id == uid, MessageDelivery.status.in_([0, 3]))
+            .limit(50)
+        )
+        for delivery, message in pending.all():
+            await manager.send_personal_message(
+                uid,
+                json.dumps(
+                    {
+                        "delivery_id": delivery.id,
+                        "message_id": message.id,
+                        "title": message.title,
+                        "content": message.content,
+                        "payload": message.payload,
+                    }
+                ),
+            )
+            await db.execute(
+                MessageDelivery.__table__
+                .update()
+                .where(MessageDelivery.id == delivery.id)
+                .values(status=1, sent_at=datetime.utcnow())
+            )
+            await db.commit()
     try:
         await websocket.send_text("connected")
         while True:
