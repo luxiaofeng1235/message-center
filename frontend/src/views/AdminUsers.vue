@@ -75,6 +75,7 @@ const form = reactive({
   id: null,
   username: '',
   password: '',
+  old_password: '',
   display_name: '',
   phone: '',
   is_super: false,
@@ -87,6 +88,17 @@ const rules = {
       trigger: 'blur',
       validator: (_, value, cb) => {
         if (!form.id && !value) return cb(new Error('请输入密码'))
+        cb()
+      },
+    },
+  ],
+  old_password: [
+    {
+      trigger: 'blur',
+      validator: (_, value, cb) => {
+        if (form.id && form.id === auth.user?.id && form.password) {
+          if (!value) return cb(new Error('请输入原密码'))
+        }
         cb()
       },
     },
@@ -104,12 +116,13 @@ const openForm = (row = null) => {
   visible.value = true
   formRef.value?.clearValidate()
   if (row) {
-    Object.assign(form, { ...row, password: '' })
+    Object.assign(form, { ...row, password: '', old_password: '' })
   } else {
     Object.assign(form, {
       id: null,
       username: '',
       password: '',
+      old_password: '',
       display_name: '',
       phone: '',
       is_super: false,
@@ -122,7 +135,10 @@ const save = async () => {
   try {
     await formRef.value.validate()
     const payload = { ...form }
-    if (payload.id && !payload.password) delete payload.password
+    if (payload.id && !payload.password) {
+      delete payload.password
+      delete payload.old_password
+    }
     if (payload.id) await updateAdminUser(payload.id, payload)
     else await createAdminUser(payload)
     ElMessage.success('保存成功')
