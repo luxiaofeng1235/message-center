@@ -23,7 +23,8 @@
     <el-container>
       <el-header class="header">
         <div class="title">后台管理</div>
-        <div>
+        <div class="actions">
+          <el-button type="text" @click="profileVisible = true">个人资料</el-button>
           <el-button type="text" @click="logout">退出</el-button>
         </div>
       </el-header>
@@ -31,6 +32,7 @@
         <RouterView />
       </el-main>
     </el-container>
+    <ProfileDialog v-model:visible="profileVisible" />
   </el-container>
 </template>
 
@@ -38,11 +40,13 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import ProfileDialog from './ProfileDialog.vue'
 
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 const active = computed(() => route.path)
+const profileVisible = ref(false)
 
 const logout = () => {
   auth.logout()
@@ -61,5 +65,8 @@ const logout = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+.actions > .el-button {
+  margin-left: 8px;
 }
 </style>

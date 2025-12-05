@@ -49,9 +49,9 @@ const fetchData = async () => {
   const params = { page: meta.page, page_size: meta.page_size }
   if (filters.user_id) params.user_id = filters.user_id
   if (filters.status !== '') params.status = filters.status
-  const { data } = await listDeliveries(params)
-  items.value = data.items
-  Object.assign(meta, data.meta)
+  const res = await listDeliveries(params)
+  items.value = res.items
+  Object.assign(meta, res.meta)
 }
 
 const pageChange = (p) => {
