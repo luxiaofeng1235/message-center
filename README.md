@@ -8,7 +8,8 @@ Message Center 后端说明
 2. 初始化数据库：执行 `message_center_schema.sql`（当前去除外键，包含 DROP TABLE IF EXISTS）
 3. 启动 API：`uvicorn app.main:app --reload`（默认端口 8000）
 4. 启动 Redis 消费者（可选，处理实时推送）：`python -m app.workers.message_consumer`
-
+5. 热更新启动
+ uvicorn app.main:app --host 0.0.0.0 --port 9000 --reload 
 # 配置
 - 通过 `.env` 设置 `mysql_dsn`、`redis_url`、`jwt_secret_key` 等，详见 `app/core/config.py`
 - App 调用时在 Header 中携带 `X-App-Secret` 用于校验调用方
