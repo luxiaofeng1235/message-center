@@ -76,6 +76,7 @@ const send = async () => {
     if (err instanceof SyntaxError) {
       ElMessage.error('Payload 必须是合法 JSON')
     } else {
+      if (!err?.response && err?.name === 'Error' && !err?.msg) return
       ElMessage.error(err.response?.data?.detail || err.msg || '发送失败')
     }
   } finally {
