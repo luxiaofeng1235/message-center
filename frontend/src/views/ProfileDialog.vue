@@ -39,7 +39,7 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import api from '../api/http'
+import { getProfile, updateProfile } from '../api'
 import { useAuthStore } from '../stores/auth'
 
 const props = defineProps({
@@ -67,15 +67,22 @@ const formPwd = ref({
   old_password: '',
   new_password: '',
 })
+const formRef = ref()
+const pwdRef = ref()
+const rulesInfo = {
+  display_name: [{ required: true, message: '请输入显示名称', trigger: 'blur' }],
+}
+const rulesPwd = {
+  new_password: [{ required: true, message: '请输入新密码', trigger: 'blur' }],
+}
 
 const auth = useAuthStore()
 
 const fetchProfile = async () => {
   try {
-    // 假设后台提供当前用户详情接口；若无可用 token 解码或复用 admin 接口
-    const res = await api.get('/api/v1/admin/users', { params: { page: 1, page_size: 1 } })
-    const me = res.items?.find((u) => u.username === auth.user?.username) || res.items?.[0]
+    const me = await getProfile()
     if (me) {
+      auth.setAuth(auth.token, me)
       formInfo.value.username = me.username
       formInfo.value.display_name = me.display_name
       formInfo.value.phone = me.phone
@@ -91,7 +98,8 @@ const close = () => {
 
 const saveInfo = async () => {
   try {
-    const res = await api.put(`/api/v1/admin/users/${auth.user?.id || 1}`, {
+    await formRef.value.validate()
+    await updateProfile({
       display_name: formInfo.value.display_name,
       phone: formInfo.value.phone,
     })
@@ -104,7 +112,8 @@ const saveInfo = async () => {
 
 const savePwd = async () => {
   try {
-    const res = await api.put(`/api/v1/admin/users/${auth.user?.id || 1}`, {
+    await pwdRef.value.validate()
+    await updateProfile({
       password: formPwd.value.new_password,
     })
     ElMessage.success('密码已更新')

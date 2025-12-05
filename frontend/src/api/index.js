@@ -2,6 +2,8 @@ import api from './http'
 
 // Auth
 export const login = (payload) => api.post('/api/v1/admin/auth/login', payload)
+export const getProfile = () => api.get('/api/v1/admin/auth/me')
+export const updateProfile = (payload) => api.put('/api/v1/admin/auth/profile', payload)
 
 // Admin users
 export const listAdminUsers = (params) => api.get('/api/v1/admin/users', { params })

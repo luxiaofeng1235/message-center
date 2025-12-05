@@ -17,11 +17,18 @@
     <div class="form-panel">
       <h2>欢迎登录</h2>
       <p class="subtitle">请使用管理员账号登录后台</p>
-      <el-form :model="form" @submit.prevent="onSubmit" label-position="top" class="form">
-        <el-form-item label="用户名">
+      <el-form
+        ref="formRef"
+        :model="form"
+        :rules="rules"
+        @submit.prevent="onSubmit"
+        label-position="top"
+        class="form"
+      >
+        <el-form-item label="用户名" prop="username">
           <el-input v-model="form.username" size="large" autocomplete="username" />
         </el-form-item>
-        <el-form-item label="密码">
+        <el-form-item label="密码" prop="password">
           <el-input v-model="form.password" size="large" type="password" autocomplete="current-password" />
         </el-form-item>
         <el-button type="primary" size="large" @click="onSubmit" :loading="loading" class="full-btn">登录</el-button>
@@ -35,22 +42,29 @@ import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { ChatDotRound, Share, Bell } from '@element-plus/icons-vue'
-import { login } from '../api'
+import { login, getProfile } from '../api'
 import { useAuthStore } from '../stores/auth'
 
 const router = useRouter()
 const auth = useAuthStore()
 const loading = ref(false)
+const formRef = ref()
 const form = reactive({
   username: '',
   password: '',
 })
+const rules = {
+  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+  password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+}
 
 const onSubmit = async () => {
   loading.value = true
   try {
+    await formRef.value.validate()
     const data = await login(form)
-    auth.setAuth(data.access_token, { username: form.username })
+    const profile = await getProfile()
+    auth.setAuth(data.access_token, profile)
     router.push('/')
   } catch (err) {
     const msg = err?.msg || err?.response?.data?.detail || err?.detail || '登录失败'
