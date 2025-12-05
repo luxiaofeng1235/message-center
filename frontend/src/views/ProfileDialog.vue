@@ -20,7 +20,7 @@
       </el-tab-pane>
       <el-tab-pane label="修改密码" name="pwd">
         <el-form ref="pwdRef" :model="formPwd" :rules="rulesPwd" label-width="100px">
-          <el-form-item label="旧密码">
+          <el-form-item label="旧密码" prop="old_password">
             <el-input v-model="formPwd.old_password" type="password" />
           </el-form-item>
           <el-form-item label="新密码" prop="new_password">
@@ -73,6 +73,7 @@ const rulesInfo = {
   display_name: [{ required: true, message: '请输入显示名称', trigger: 'blur' }],
 }
 const rulesPwd = {
+  old_password: [{ required: true, message: '请输入旧密码', trigger: 'blur' }],
   new_password: [{ required: true, message: '请输入新密码', trigger: 'blur' }],
 }
 
@@ -116,6 +117,7 @@ const savePwd = async () => {
   try {
     await pwdRef.value.validate()
     await updateProfile({
+      old_password: formPwd.value.old_password,
       password: formPwd.value.new_password,
     })
     ElMessage.success('密码已更新')

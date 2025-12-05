@@ -23,6 +23,7 @@ class AdminUpdate(BaseModel):
     is_super: bool | None = None
     is_active: bool | None = None
     password: str | None = Field(default=None, description="如果需要重置密码", min_length=6)
+    old_password: str | None = Field(default=None, description="修改自身密码时必填", min_length=6)
 
 
 class AdminOut(BaseModel):
