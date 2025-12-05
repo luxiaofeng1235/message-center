@@ -1,19 +1,19 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class AppCreate(BaseModel):
-    name: str
-    code: str
-    secret: str
+    name: str = Field(min_length=1)
+    code: str = Field(min_length=1)
+    secret: str = Field(min_length=1)
     description: str | None = None
     is_active: bool = True
 
 
 class AppUpdate(BaseModel):
-    name: str | None = None
-    secret: str | None = None
+    name: str | None = Field(default=None, min_length=1)
+    secret: str | None = Field(default=None, min_length=1)
     description: str | None = None
     is_active: bool | None = None
 

@@ -23,11 +23,11 @@
     />
 
     <el-dialog v-model="visible" title="角色">
-      <el-form :model="form" label-width="80px">
-        <el-form-item label="名称">
+      <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
+        <el-form-item label="名称" prop="name">
           <el-input v-model="form.name" />
         </el-form-item>
-        <el-form-item label="编码">
+        <el-form-item label="编码" prop="code">
           <el-input v-model="form.code" :disabled="!!form.id" />
         </el-form-item>
         <el-form-item label="描述">
@@ -50,12 +50,17 @@ import { listRoles, createRole, updateRole } from '../api'
 const items = ref([])
 const meta = reactive({ total: 0, page: 1, page_size: 20 })
 const visible = ref(false)
+const formRef = ref()
 const form = reactive({
   id: null,
   name: '',
   code: '',
   description: '',
 })
+const rules = {
+  name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
+  code: [{ required: true, message: '请输入编码', trigger: 'blur' }],
+}
 
 const fetchData = async () => {
   const res = await listRoles({ page: meta.page, page_size: meta.page_size })
@@ -65,6 +70,7 @@ const fetchData = async () => {
 
 const openForm = (row = null) => {
   visible.value = true
+  formRef.value?.clearValidate()
   if (row) {
     Object.assign(form, row)
   } else {
@@ -74,6 +80,7 @@ const openForm = (row = null) => {
 
 const save = async () => {
   try {
+    await formRef.value.validate()
     if (form.id) {
       await updateRole(form.id, form)
     } else {

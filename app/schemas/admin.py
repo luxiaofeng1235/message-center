@@ -4,13 +4,13 @@ from pydantic import BaseModel, Field
 
 
 class AdminLogin(BaseModel):
-    username: str
-    password: str
+    username: str = Field(min_length=1)
+    password: str = Field(min_length=1)
 
 
 class AdminCreate(BaseModel):
-    username: str
-    password: str
+    username: str = Field(min_length=1)
+    password: str = Field(min_length=6)
     display_name: str | None = None
     phone: str | None = None
     is_super: bool = False
@@ -22,7 +22,7 @@ class AdminUpdate(BaseModel):
     phone: str | None = None
     is_super: bool | None = None
     is_active: bool | None = None
-    password: str | None = Field(default=None, description="如果需要重置密码")
+    password: str | None = Field(default=None, description="如果需要重置密码", min_length=6)
 
 
 class AdminOut(BaseModel):

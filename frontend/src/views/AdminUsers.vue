@@ -33,12 +33,12 @@
     />
 
     <el-dialog v-model="visible" title="管理员">
-      <el-form :model="form" label-width="80px">
-        <el-form-item label="用户名">
+      <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
+        <el-form-item label="用户名" prop="username">
           <el-input v-model="form.username" :disabled="!!form.id" />
         </el-form-item>
-        <el-form-item label="密码">
-          <el-input v-model="form.password" type="password" />
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="form.password" type="password" autocomplete="new-password" />
         </el-form-item>
         <el-form-item label="名称">
           <el-input v-model="form.display_name" />
@@ -47,10 +47,10 @@
           <el-input v-model="form.phone" />
         </el-form-item>
         <el-form-item label="超级">
-          <el-switch v-model="form.is_super" />
+          <el-switch v-model="form.is_super" :disabled="!auth.user?.is_super || form.id === auth.user?.id" />
         </el-form-item>
         <el-form-item label="启用">
-          <el-switch v-model="form.is_active" />
+          <el-switch v-model="form.is_active" :disabled="form.id === auth.user?.id || !auth.user?.is_super" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -65,10 +65,12 @@
 import { reactive, ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { listAdminUsers, createAdminUser, updateAdminUser } from '../api'
+import { useAuthStore } from '../stores/auth'
 
 const items = ref([])
 const meta = reactive({ total: 0, page: 1, page_size: 20 })
 const visible = ref(false)
+const formRef = ref()
 const form = reactive({
   id: null,
   username: '',
@@ -78,6 +80,21 @@ const form = reactive({
   is_super: false,
   is_active: true,
 })
+const rules = {
+  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+  password: [
+    {
+      required: true,
+      message: '请输入密码',
+      trigger: 'blur',
+      validator: (_, value, cb) => {
+        if (!form.id && !value) return cb(new Error('请输入密码'))
+        cb()
+      },
+    },
+  ],
+}
+const auth = useAuthStore()
 
 const fetchData = async () => {
   const res = await listAdminUsers({ page: meta.page, page_size: meta.page_size })
@@ -87,6 +104,7 @@ const fetchData = async () => {
 
 const openForm = (row = null) => {
   visible.value = true
+  formRef.value?.clearValidate()
   if (row) {
     Object.assign(form, { ...row, password: '' })
   } else {
@@ -104,20 +122,28 @@ const openForm = (row = null) => {
 
 const save = async () => {
   try {
-    if (form.id) {
-      await updateAdminUser(form.id, form)
-    } else {
-      await createAdminUser(form)
-    }
+    await formRef.value.validate()
+    const payload = { ...form }
+    if (payload.id && !payload.password) delete payload.password
+    if (payload.id) await updateAdminUser(payload.id, payload)
+    else await createAdminUser(payload)
     ElMessage.success('保存成功')
     visible.value = false
     fetchData()
   } catch (err) {
-    ElMessage.error(err.response?.data?.detail || '保存失败')
+    if (err?.msg || err?.detail) {
+      ElMessage.error(err.msg || err.detail)
+    } else {
+      ElMessage.error(err.response?.data?.detail || err.message || '保存失败')
+    }
   }
 }
 
 const toggleActive = async (row) => {
+  if (row.id === auth.user?.id || !auth.user?.is_super) {
+    row.is_active = !row.is_active
+    return
+  }
   await updateAdminUser(row.id, { is_active: row.is_active })
 }
 

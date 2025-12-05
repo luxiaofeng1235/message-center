@@ -1,15 +1,15 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class MessageTemplateCreate(BaseModel):
     app_id: int
     channel_id: int | None = None
-    template_key: str
-    name: str
+    template_key: str = Field(min_length=1)
+    name: str = Field(min_length=1)
     title_template: str | None = None
-    content_template: str
+    content_template: str = Field(min_length=1)
     payload_template: dict | None = None
     is_default: bool = False
 

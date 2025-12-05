@@ -1,11 +1,11 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class UserCreate(BaseModel):
     app_id: int
-    external_user_id: str
+    external_user_id: str = Field(min_length=1)
     nickname: str | None = None
 
 

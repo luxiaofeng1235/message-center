@@ -1,18 +1,18 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ChannelCreate(BaseModel):
     app_id: int
-    channel_key: str
-    name: str
+    channel_key: str = Field(min_length=1)
+    name: str = Field(min_length=1)
     description: str | None = None
     is_active: bool = True
 
 
 class ChannelUpdate(BaseModel):
-    name: str | None = None
+    name: str | None = Field(default=None, min_length=1)
     description: str | None = None
     is_active: bool | None = None
 

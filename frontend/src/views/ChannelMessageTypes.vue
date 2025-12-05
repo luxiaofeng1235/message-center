@@ -33,11 +33,11 @@
     />
 
     <el-dialog v-model="visible" title="通道消息类型">
-      <el-form :model="form" label-width="90px">
-        <el-form-item label="通道ID">
+      <el-form ref="formRef" :model="form" :rules="rules" label-width="90px">
+        <el-form-item label="通道ID" prop="channel_id">
           <el-input v-model.number="form.channel_id" />
         </el-form-item>
-        <el-form-item label="类型ID">
+        <el-form-item label="类型ID" prop="message_type_id">
           <el-input v-model.number="form.message_type_id" />
         </el-form-item>
         <el-form-item label="默认">
@@ -70,6 +70,7 @@ import {
 const items = ref([])
 const meta = reactive({ total: 0, page: 1, page_size: 20 })
 const visible = ref(false)
+const formRef = ref()
 const form = reactive({
   id: null,
   channel_id: null,
@@ -78,6 +79,10 @@ const form = reactive({
   is_active: true,
   configStr: '',
 })
+const rules = {
+  channel_id: [{ required: true, message: '请输入通道ID', trigger: 'blur' }],
+  message_type_id: [{ required: true, message: '请输入类型ID', trigger: 'blur' }],
+}
 
 const fetchData = async () => {
   const res = await listChannelMessageTypes({ page: meta.page, page_size: meta.page_size })
@@ -87,6 +92,7 @@ const fetchData = async () => {
 
 const openForm = (row = null) => {
   visible.value = true
+  formRef.value?.clearValidate()
   if (row) {
     Object.assign(form, {
       ...row,
@@ -116,6 +122,7 @@ const parseConfig = () => {
 
 const save = async () => {
   try {
+    await formRef.value.validate()
     const payload = {
       channel_id: form.channel_id,
       message_type_id: form.message_type_id,

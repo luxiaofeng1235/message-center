@@ -30,23 +30,23 @@
     />
 
     <el-dialog v-model="visible" title="模板">
-      <el-form :model="form" label-width="90px">
-        <el-form-item label="AppID">
+      <el-form ref="formRef" :model="form" :rules="rules" label-width="90px">
+        <el-form-item label="AppID" prop="app_id">
           <el-input v-model.number="form.app_id" />
         </el-form-item>
         <el-form-item label="通道ID">
           <el-input v-model.number="form.channel_id" />
         </el-form-item>
-        <el-form-item label="Key">
+        <el-form-item label="Key" prop="template_key">
           <el-input v-model="form.template_key" :disabled="!!form.id" />
         </el-form-item>
-        <el-form-item label="名称">
+        <el-form-item label="名称" prop="name">
           <el-input v-model="form.name" />
         </el-form-item>
         <el-form-item label="标题模板">
           <el-input v-model="form.title_template" />
         </el-form-item>
-        <el-form-item label="内容模板">
+        <el-form-item label="内容模板" prop="content_template">
           <el-input v-model="form.content_template" type="textarea" />
         </el-form-item>
         <el-form-item label="Payload模板">
@@ -72,6 +72,7 @@ import { listTemplates, createTemplate, updateTemplate } from '../api'
 const items = ref([])
 const meta = reactive({ total: 0, page: 1, page_size: 20 })
 const visible = ref(false)
+const formRef = ref()
 const form = reactive({
   id: null,
   app_id: null,
@@ -83,6 +84,12 @@ const form = reactive({
   payloadStr: '',
   is_default: false,
 })
+const rules = {
+  app_id: [{ required: true, message: '请输入AppID', trigger: 'blur' }],
+  template_key: [{ required: true, message: '请输入模板Key', trigger: 'blur' }],
+  name: [{ required: true, message: '请输入模板名称', trigger: 'blur' }],
+  content_template: [{ required: true, message: '请输入内容模板', trigger: 'blur' }],
+}
 
 const fetchData = async () => {
   const res = await listTemplates({ page: meta.page, page_size: meta.page_size })
@@ -92,6 +99,7 @@ const fetchData = async () => {
 
 const openForm = (row = null) => {
   visible.value = true
+  formRef.value?.clearValidate()
   if (row) {
     Object.assign(form, {
       ...row,
@@ -124,6 +132,7 @@ const parsePayload = () => {
 
 const save = async () => {
   try {
+    await formRef.value.validate()
     const payload = {
       app_id: form.app_id,
       channel_id: form.channel_id,

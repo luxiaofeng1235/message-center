@@ -1,11 +1,11 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class MessageTypeCreate(BaseModel):
-    code: str
-    name: str
+    code: str = Field(min_length=1)
+    name: str = Field(min_length=1)
     description: str | None = None
     is_active: bool = True
 

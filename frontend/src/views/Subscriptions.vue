@@ -29,17 +29,17 @@
     />
 
     <el-dialog v-model="visible" title="订阅">
-      <el-form :model="form" label-width="90px">
-        <el-form-item label="用户ID">
+      <el-form ref="formRef" :model="form" :rules="rules" label-width="90px">
+        <el-form-item label="用户ID" prop="user_id">
           <el-input v-model.number="form.user_id" />
         </el-form-item>
-        <el-form-item label="通道ID">
+        <el-form-item label="通道ID" prop="channel_id">
           <el-input v-model.number="form.channel_id" />
         </el-form-item>
-        <el-form-item label="类型ID">
+        <el-form-item label="类型ID" prop="message_type_id">
           <el-input v-model.number="form.message_type_id" />
         </el-form-item>
-        <el-form-item label="来源">
+        <el-form-item label="来源" prop="source">
           <el-input v-model="form.source" />
         </el-form-item>
         <el-form-item label="启用">
@@ -62,6 +62,7 @@ import { listSubscriptions, createSubscription, updateSubscription } from '../ap
 const items = ref([])
 const meta = reactive({ total: 0, page: 1, page_size: 20 })
 const visible = ref(false)
+const formRef = ref()
 const form = reactive({
   id: null,
   user_id: null,
@@ -70,6 +71,12 @@ const form = reactive({
   source: '1',
   is_active: true,
 })
+const rules = {
+  user_id: [{ required: true, message: '请输入用户ID', trigger: 'blur' }],
+  channel_id: [{ required: true, message: '请输入通道ID', trigger: 'blur' }],
+  message_type_id: [{ required: true, message: '请输入类型ID', trigger: 'blur' }],
+  source: [{ required: true, message: '请输入来源', trigger: 'blur' }],
+}
 
 const fetchData = async () => {
   const res = await listSubscriptions({ page: meta.page, page_size: meta.page_size })
@@ -79,6 +86,7 @@ const fetchData = async () => {
 
 const openForm = (row = null) => {
   visible.value = true
+  formRef.value?.clearValidate()
   if (row) {
     Object.assign(form, row)
   } else {
@@ -88,6 +96,7 @@ const openForm = (row = null) => {
 
 const save = async () => {
   try {
+    await formRef.value.validate()
     if (form.id) {
       await updateSubscription(form.id, form)
     } else {
