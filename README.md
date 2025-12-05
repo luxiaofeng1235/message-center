@@ -1,7 +1,13 @@
 # 消息中台（FastAPI + Vue）说明（更新：2025-12-05）
 
+## 架构与技术栈
+- 后端：FastAPI（Python 3.12）、SQLAlchemy(异步) + MySQL 8、Redis Pub/Sub、JWT 认证、bcrypt 密码哈希。
+- 前端：Vue 3 + Vite + Element Plus，Pinia 状态管理，Axios 封装。
+- 部署：uvicorn（可 --reload 开发模式），可选单独消费者进程处理推送/重试。
+- 统一返回格式：`{"code":1,"msg":"ok","data":...}`；失败 `{"code":0,"msg":"错误", "data":null}`。
+
 ## 功能概览
-- 管理端：登录、管理员/角色、业务系统、通道、消息类型、通道-类型映射、模板、用户映射、订阅管理（统一分页，返回格式 `{"code":1,"msg":"ok","data":...}`）。
+- 管理端：登录、管理员/角色、业务系统、通道、消息类型、通道-类型映射、模板、业务用户映射、订阅管理（均分页）。
 - 业务接口：消息发送（校验 App Secret，入库+投递+发布 Redis）、消息/投递查询。
 - WebSocket：`/ws` 连接（user_id/instance_id），补发未送达，ACK 更新投递状态。
 - 消费者：订阅 Redis，向在线用户推送并重试未送达/失败投递。
@@ -42,6 +48,16 @@ npm run dev  # 默认 http://localhost:5173，API 默认 http://localhost:9000
 - 消息：`POST /api/v1/messages`（Header `X-App-Secret`），`GET /api/v1/messages`，`GET /api/v1/messages/deliveries`
 - 实例心跳：`POST /api/v1/instances/heartbeat`
 - WebSocket：`/ws?user_id=...&instance_id=...`，ACK `{"delivery_id":x,"status":2}`
+
+## 返回格式约定
+- 成功：`{"code":1,"msg":"ok","data":...}`
+- 失败：`{"code":0,"msg":"错误描述","data":null}`（HTTP 状态码按场景返回 4xx/5xx）
+
+## 数据表（示例）
+- mc_admin_user / mc_admin_role / mc_admin_user_role
+- mc_app / mc_user / mc_channel / mc_message_type / mc_channel_message_type
+- mc_message_template / mc_subscription / mc_message / mc_message_delivery
+- mc_instance / mc_client_connection
 
 ## 备注
 - Alembic 迁移未生成；当前通过 SQL 初始化，后续可基于 `app.db.base.Base` 补迁移。
