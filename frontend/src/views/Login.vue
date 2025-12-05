@@ -53,7 +53,8 @@ const onSubmit = async () => {
     auth.setAuth(data.access_token, { username: form.username })
     router.push('/')
   } catch (err) {
-    ElMessage.error(err.msg || err.response?.data?.detail || '登录失败')
+    const msg = err?.msg || err?.response?.data?.detail || err?.detail || '登录失败'
+    ElMessage.error(msg)
   } finally {
     loading.value = false
   }

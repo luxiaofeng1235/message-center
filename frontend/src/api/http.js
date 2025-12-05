@@ -26,12 +26,17 @@ api.interceptors.response.use(
     return resp
   },
   (error) => {
+    const url = error?.config?.url || ''
+    // 登录接口的 401 不触发登出重定向，交给页面处理
+    if (url.includes('/api/v1/admin/auth/login')) {
+      return Promise.reject(error.response?.data || error)
+    }
     if (error.response && error.response.status === 401) {
       const auth = useAuthStore()
       auth.logout()
       window.location.href = '/login'
     }
-    return Promise.reject(error)
+    return Promise.reject(error.response?.data || error)
   }
 )
 
