@@ -2,10 +2,6 @@
 更新日期: 2025-12-05
 """
 
-"""订阅后台服务
-更新日期: 2025-12-05
-"""
-
 from typing import Sequence
 
 from fastapi import HTTPException, status
