@@ -36,12 +36,12 @@ class SubscriptionCreate(BaseModel):
     channel_id: int
     message_type_id: int
     is_active: bool = True
-    source: str = "1"
+    source: int = 1
 
 
 class SubscriptionUpdate(BaseModel):
     is_active: bool | None = None
-    source: str | None = None
+    source: int | None = None
 
 
 class SubscriptionOut(BaseModel):
@@ -50,7 +50,7 @@ class SubscriptionOut(BaseModel):
     channel_id: int
     message_type_id: int
     is_active: bool
-    source: str
+    source: int
     created_at: datetime | None = None
     updated_at: datetime | None = None
 

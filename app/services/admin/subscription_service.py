@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.channel import Channel
 from app.models.channel_message_type import ChannelMessageType
 from app.models.subscription import Subscription
-from app.schemas.channel import SubscriptionCreate, SubscriptionUpdate
+from app.schemas.channel import SubscriptionCreate, SubscriptionOut, SubscriptionUpdate
 from app.schemas.common import Page, PageMeta
 from app.utils.common import paginate_params
 
@@ -45,7 +45,8 @@ class SubscriptionService:
         total = await self.db.scalar(count_stmt)
         result = await self.db.execute(stmt.order_by(Subscription.id.desc()).offset(offset).limit(limit))
         items: Sequence[Subscription] = result.scalars().all()
-        return Page(meta=PageMeta(total=total or 0, page=page, page_size=page_size), items=items)
+        items_out = [SubscriptionOut.model_validate(i, from_attributes=True) for i in items]
+        return Page(meta=PageMeta(total=total or 0, page=page, page_size=page_size), items=items_out)
 
     async def create_subscription(self, data: SubscriptionCreate) -> Subscription:
         # 校验通道
