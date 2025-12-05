@@ -137,7 +137,7 @@ class MessageService:
 
     async def list_messages(
         self, page: int, page_size: int, app_id: int | None = None, channel_id: int | None = None
-    ) -> Page[Message]:
+    ) -> Page[MessageOut]:
         offset, limit = paginate_params(page, page_size)
         stmt = select(Message)
         count_stmt = select(func.count()).select_from(Message)
@@ -150,11 +150,12 @@ class MessageService:
         total = await self.db.scalar(count_stmt)
         result = await self.db.execute(stmt.order_by(Message.id.desc()).offset(offset).limit(limit))
         items: Sequence[Message] = result.scalars().all()
-        return Page(meta=PageMeta(total=total or 0, page=page, page_size=page_size), items=items)
+        items_out = [MessageOut.model_validate(i, from_attributes=True) for i in items]
+        return Page(meta=PageMeta(total=total or 0, page=page, page_size=page_size), items=items_out)
 
     async def list_deliveries(
         self, page: int, page_size: int, user_id: int | None = None, status: int | None = None
-    ) -> Page[MessageDelivery]:
+    ) -> Page[MessageDeliveryOut]:
         offset, limit = paginate_params(page, page_size)
         stmt = select(MessageDelivery)
         count_stmt = select(func.count()).select_from(MessageDelivery)
@@ -167,4 +168,5 @@ class MessageService:
         total = await self.db.scalar(count_stmt)
         result = await self.db.execute(stmt.order_by(MessageDelivery.id.desc()).offset(offset).limit(limit))
         items: Sequence[MessageDelivery] = result.scalars().all()
-        return Page(meta=PageMeta(total=total or 0, page=page, page_size=page_size), items=items)
+        items_out = [MessageDeliveryOut.model_validate(i, from_attributes=True) for i in items]
+        return Page(meta=PageMeta(total=total or 0, page=page, page_size=page_size), items=items_out)

@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.message_type import MessageType
 from app.schemas.common import Page, PageMeta
-from app.schemas.message_type import MessageTypeCreate, MessageTypeUpdate
+from app.schemas.message_type import MessageTypeCreate, MessageTypeOut, MessageTypeUpdate
 from app.utils.common import paginate_params
 
 
@@ -20,16 +20,17 @@ class MessageTypeService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def list_message_types(self, page: int, page_size: int) -> Page[MessageType]:
+    async def list_message_types(self, page: int, page_size: int) -> Page[MessageTypeOut]:
         offset, limit = paginate_params(page, page_size)
         total = await self.db.scalar(select(func.count()).select_from(MessageType))
         result = await self.db.execute(
             select(MessageType).order_by(MessageType.id.desc()).offset(offset).limit(limit)
         )
         items: Sequence[MessageType] = result.scalars().all()
-        return Page(meta=PageMeta(total=total or 0, page=page, page_size=page_size), items=items)
+        items_out = [MessageTypeOut.model_validate(mt, from_attributes=True) for mt in items]
+        return Page(meta=PageMeta(total=total or 0, page=page, page_size=page_size), items=items_out)
 
-    async def create_message_type(self, data: MessageTypeCreate) -> MessageType:
+    async def create_message_type(self, data: MessageTypeCreate) -> MessageTypeOut:
         exists = await self.db.scalar(select(MessageType).where(MessageType.code == data.code))
         if exists:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Message type code exists")
@@ -42,9 +43,9 @@ class MessageTypeService:
         self.db.add(mt)
         await self.db.commit()
         await self.db.refresh(mt)
-        return mt
+        return MessageTypeOut.model_validate(mt, from_attributes=True)
 
-    async def update_message_type(self, type_id: int, data: MessageTypeUpdate) -> MessageType:
+    async def update_message_type(self, type_id: int, data: MessageTypeUpdate) -> MessageTypeOut:
         result = await self.db.execute(select(MessageType).where(MessageType.id == type_id))
         mt = result.scalar_one_or_none()
         if not mt:
@@ -57,4 +58,4 @@ class MessageTypeService:
             mt.is_active = data.is_active
         await self.db.commit()
         await self.db.refresh(mt)
-        return mt
+        return MessageTypeOut.model_validate(mt, from_attributes=True)

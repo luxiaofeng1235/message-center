@@ -26,7 +26,7 @@ class ChannelMessageTypeService:
 
     async def list_items(
         self, page: int, page_size: int, channel_id: int | None = None
-    ) -> Page[ChannelMessageType]:
+    ) -> Page[ChannelMessageTypeOut]:
         offset, limit = paginate_params(page, page_size)
         stmt = select(ChannelMessageType)
         count_stmt = select(func.count()).select_from(ChannelMessageType)
@@ -36,7 +36,8 @@ class ChannelMessageTypeService:
         total = await self.db.scalar(count_stmt)
         result = await self.db.execute(stmt.order_by(ChannelMessageType.id.desc()).offset(offset).limit(limit))
         items: Sequence[ChannelMessageType] = result.scalars().all()
-        return Page(meta=PageMeta(total=total or 0, page=page, page_size=page_size), items=items)
+        items_out = [ChannelMessageTypeOut.model_validate(i, from_attributes=True) for i in items]
+        return Page(meta=PageMeta(total=total or 0, page=page, page_size=page_size), items=items_out)
 
     async def create_item(self, data: ChannelMessageTypeCreate) -> ChannelMessageType:
         exists = await self.db.scalar(

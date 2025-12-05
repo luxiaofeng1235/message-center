@@ -9,7 +9,7 @@ from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.channel import Channel
-from app.schemas.channel import ChannelCreate, ChannelUpdate
+from app.schemas.channel import ChannelCreate, ChannelOut, ChannelUpdate
 from app.schemas.common import Page, PageMeta
 from app.utils.common import paginate_params
 
@@ -20,7 +20,7 @@ class ChannelService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def list_channels(self, page: int, page_size: int, app_id: int | None = None) -> Page[Channel]:
+    async def list_channels(self, page: int, page_size: int, app_id: int | None = None) -> Page[ChannelOut]:
         offset, limit = paginate_params(page, page_size)
         stmt = select(Channel)
         count_stmt = select(func.count()).select_from(Channel)
@@ -30,7 +30,8 @@ class ChannelService:
         total = await self.db.scalar(count_stmt)
         result = await self.db.execute(stmt.order_by(Channel.id.desc()).offset(offset).limit(limit))
         items: Sequence[Channel] = result.scalars().all()
-        return Page(meta=PageMeta(total=total or 0, page=page, page_size=page_size), items=items)
+        items_out = [ChannelOut.model_validate(i, from_attributes=True) for i in items]
+        return Page(meta=PageMeta(total=total or 0, page=page, page_size=page_size), items=items_out)
 
     async def create_channel(self, data: ChannelCreate) -> Channel:
         exists = await self.db.scalar(

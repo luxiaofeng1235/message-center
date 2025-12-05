@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.message_template import MessageTemplate
 from app.schemas.common import Page, PageMeta
-from app.schemas.message_template import MessageTemplateCreate, MessageTemplateUpdate
+from app.schemas.message_template import MessageTemplateCreate, MessageTemplateOut, MessageTemplateUpdate
 from app.utils.common import paginate_params
 
 
@@ -22,7 +22,7 @@ class TemplateService:
 
     async def list_templates(
         self, page: int, page_size: int, app_id: int | None = None, channel_id: int | None = None
-    ) -> Page[MessageTemplate]:
+    ) -> Page[MessageTemplateOut]:
         offset, limit = paginate_params(page, page_size)
         stmt = select(MessageTemplate)
         count_stmt = select(func.count()).select_from(MessageTemplate)
@@ -35,9 +35,10 @@ class TemplateService:
         total = await self.db.scalar(count_stmt)
         result = await self.db.execute(stmt.order_by(MessageTemplate.id.desc()).offset(offset).limit(limit))
         items: Sequence[MessageTemplate] = result.scalars().all()
-        return Page(meta=PageMeta(total=total or 0, page=page, page_size=page_size), items=items)
+        items_out = [MessageTemplateOut.model_validate(i, from_attributes=True) for i in items]
+        return Page(meta=PageMeta(total=total or 0, page=page, page_size=page_size), items=items_out)
 
-    async def create_template(self, data: MessageTemplateCreate) -> MessageTemplate:
+    async def create_template(self, data: MessageTemplateCreate) -> MessageTemplateOut:
         exists = await self.db.scalar(select(MessageTemplate).where(MessageTemplate.template_key == data.template_key))
         if exists:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Template key exists")
@@ -54,9 +55,9 @@ class TemplateService:
         self.db.add(tpl)
         await self.db.commit()
         await self.db.refresh(tpl)
-        return tpl
+        return MessageTemplateOut.model_validate(tpl, from_attributes=True)
 
-    async def update_template(self, template_id: int, data: MessageTemplateUpdate) -> MessageTemplate:
+    async def update_template(self, template_id: int, data: MessageTemplateUpdate) -> MessageTemplateOut:
         result = await self.db.execute(select(MessageTemplate).where(MessageTemplate.id == template_id))
         tpl = result.scalar_one_or_none()
         if not tpl:
@@ -73,4 +74,4 @@ class TemplateService:
             tpl.is_default = data.is_default
         await self.db.commit()
         await self.db.refresh(tpl)
-        return tpl
+        return MessageTemplateOut.model_validate(tpl, from_attributes=True)

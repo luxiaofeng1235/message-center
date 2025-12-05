@@ -8,9 +8,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.security import get_password_hash, verify_password
 from app.models.admin_role import AdminRole
 from app.models.admin_user import AdminUser
-from app.schemas.admin import AdminCreate, AdminUpdate
+from app.schemas.admin import AdminCreate, AdminOut, AdminUpdate
 from app.schemas.common import Page, PageMeta
-from app.schemas.role import RoleCreate, RoleUpdate
+from app.schemas.role import RoleCreate, RoleOut, RoleUpdate
 from app.utils.common import paginate_params
 
 
@@ -24,17 +24,18 @@ class AdminService:
         result = await self.db.execute(select(AdminUser).where(AdminUser.username == username))
         user = result.scalar_one_or_none()
         if not user or not verify_password(password, user.password_hash) or not user.is_active:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="登录失败!")
         return user
 
-    async def list_admins(self, page: int, page_size: int) -> Page[AdminUser]:
+    async def list_admins(self, page: int, page_size: int) -> Page[AdminOut]:
         offset, limit = paginate_params(page, page_size)
         total = await self.db.scalar(select(func.count()).select_from(AdminUser))
         result = await self.db.execute(
             select(AdminUser).order_by(AdminUser.id.desc()).offset(offset).limit(limit)
         )
         items: Sequence[AdminUser] = result.scalars().all()
-        return Page(meta=PageMeta(total=total or 0, page=page, page_size=page_size), items=items)
+        items_out = [AdminOut.model_validate(i, from_attributes=True) for i in items]
+        return Page(meta=PageMeta(total=total or 0, page=page, page_size=page_size), items=items_out)
 
     async def create_admin(self, data: AdminCreate) -> AdminUser:
         exists = await self.db.scalar(select(AdminUser).where(AdminUser.username == data.username))
@@ -86,14 +87,15 @@ class RoleService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def list_roles(self, page: int, page_size: int) -> Page[AdminRole]:
+    async def list_roles(self, page: int, page_size: int) -> Page[RoleOut]:
         offset, limit = paginate_params(page, page_size)
         total = await self.db.scalar(select(func.count()).select_from(AdminRole))
         result = await self.db.execute(
             select(AdminRole).order_by(AdminRole.id.desc()).offset(offset).limit(limit)
         )
         items: Sequence[AdminRole] = result.scalars().all()
-        return Page(meta=PageMeta(total=total or 0, page=page, page_size=page_size), items=items)
+        items_out = [RoleOut.model_validate(i, from_attributes=True) for i in items]
+        return Page(meta=PageMeta(total=total or 0, page=page, page_size=page_size), items=items_out)
 
     async def create_role(self, data: RoleCreate) -> AdminRole:
         exists = await self.db.scalar(select(AdminRole).where(AdminRole.code == data.code))
