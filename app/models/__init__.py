@@ -1,0 +1,15 @@
+from app.db.base import Base  # noqa: F401
+from app.models.admin_role import AdminRole  # noqa: F401
+from app.models.admin_user import AdminUser  # noqa: F401
+from app.models.admin_user_role import AdminUserRole  # noqa: F401
+from app.models.app import App  # noqa: F401
+from app.models.user import User  # noqa: F401
+from app.models.channel import Channel  # noqa: F401
+from app.models.message_type import MessageType  # noqa: F401
+from app.models.channel_message_type import ChannelMessageType  # noqa: F401
+from app.models.message_template import MessageTemplate  # noqa: F401
+from app.models.subscription import Subscription  # noqa: F401
+from app.models.message import Message  # noqa: F401
+from app.models.message_delivery import MessageDelivery  # noqa: F401
+from app.models.instance import Instance  # noqa: F401
+from app.models.client_connection import ClientConnection  # noqa: F401
