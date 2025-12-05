@@ -9,6 +9,7 @@ from app.api.deps import get_current_admin, get_db
 from app.schemas.channel import SubscriptionCreate, SubscriptionOut, SubscriptionUpdate
 from app.schemas.common import Page
 from app.services.admin.subscription_service import SubscriptionService
+from app.core.response import success
 
 router = APIRouter(prefix="/admin/subscriptions")
 
@@ -24,8 +25,10 @@ async def list_subscriptions(
     _: object = Depends(get_current_admin),
 ) -> Page[SubscriptionOut]:
     service = SubscriptionService(db)
-    return await service.list_subscriptions(
-        page, page_size, user_id=user_id, channel_id=channel_id, message_type_id=message_type_id
+    return success(
+        await service.list_subscriptions(
+            page, page_size, user_id=user_id, channel_id=channel_id, message_type_id=message_type_id
+        )
     )
 
 
@@ -36,7 +39,7 @@ async def create_subscription(
     _: object = Depends(get_current_admin),
 ) -> SubscriptionOut:
     service = SubscriptionService(db)
-    return await service.create_subscription(payload)
+    return success(await service.create_subscription(payload))
 
 
 @router.put("/{subscription_id}", response_model=SubscriptionOut)
@@ -47,4 +50,4 @@ async def update_subscription(
     _: object = Depends(get_current_admin),
 ) -> SubscriptionOut:
     service = SubscriptionService(db)
-    return await service.update_subscription(subscription_id, payload)
+    return success(await service.update_subscription(subscription_id, payload))
