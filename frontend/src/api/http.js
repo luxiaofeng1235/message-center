@@ -11,6 +11,10 @@ api.interceptors.request.use((config) => {
   if (auth.token) {
     config.headers.Authorization = `Bearer ${auth.token}`
   }
+  // 确保最新 user 注入到请求配置（可用于后续条件展示）
+  if (auth.user) {
+    config.headers['X-Admin-User'] = auth.user.username || ''
+  }
   return config
 })
 

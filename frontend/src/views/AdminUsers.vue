@@ -40,6 +40,9 @@
         <el-form-item label="密码" prop="password">
           <el-input v-model="form.password" type="password" autocomplete="new-password" />
         </el-form-item>
+        <el-form-item v-if="form.id === auth.user?.id" label="原密码" prop="old_password">
+          <el-input v-model="form.old_password" type="password" autocomplete="current-password" />
+        </el-form-item>
         <el-form-item label="名称">
           <el-input v-model="form.display_name" />
         </el-form-item>
