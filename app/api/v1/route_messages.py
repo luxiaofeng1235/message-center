@@ -16,7 +16,7 @@ from app.core.response import success
 router = APIRouter(prefix="/messages")
 
 
-@router.post("/", response_model=MessageSendResponse)
+@router.post("/", response_model=None)
 async def send_message(
     payload: MessageCreate,
     db: AsyncSession = Depends(get_db),
@@ -26,7 +26,7 @@ async def send_message(
     return success(await service.send_message(payload, app_secret=app_secret))
 
 
-@router.get("/", response_model=Page[MessageOut])
+@router.get("/", response_model=None)
 async def list_messages(
     page: int = 1,
     page_size: int = 20,
@@ -38,7 +38,7 @@ async def list_messages(
     return success(await service.list_messages(page, page_size, app_id=app_id, channel_id=channel_id))
 
 
-@router.get("/deliveries", response_model=Page[MessageDeliveryOut])
+@router.get("/deliveries", response_model=None)
 async def list_deliveries(
     page: int = 1,
     page_size: int = 20,

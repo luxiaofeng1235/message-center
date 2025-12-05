@@ -25,7 +25,7 @@ async def list_admins(
     return success(await service.list_admins(page, page_size))
 
 
-@router.post("/", response_model=AdminOut)
+@router.post("/", response_model=None)
 async def create_admin(
     payload: AdminCreate,
     db: AsyncSession = Depends(get_db),
@@ -35,7 +35,7 @@ async def create_admin(
     return success(await service.create_admin(payload))
 
 
-@router.put("/{admin_id}", response_model=AdminOut)
+@router.put("/{admin_id}", response_model=None)
 async def update_admin(
     admin_id: int,
     payload: AdminUpdate,

@@ -30,7 +30,7 @@ async def list_items(
     return success(await service.list_items(page, page_size, channel_id=channel_id))
 
 
-@router.post("/", response_model=ChannelMessageTypeOut)
+@router.post("/", response_model=None)
 async def create_item(
     payload: ChannelMessageTypeCreate,
     db: AsyncSession = Depends(get_db),
@@ -40,7 +40,7 @@ async def create_item(
     return success(await service.create_item(payload))
 
 
-@router.put("/{item_id}", response_model=ChannelMessageTypeOut)
+@router.put("/{item_id}", response_model=None)
 async def update_item(
     item_id: int,
     payload: ChannelMessageTypeUpdate,

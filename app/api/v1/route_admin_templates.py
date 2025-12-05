@@ -27,7 +27,7 @@ async def list_templates(
     return success(await service.list_templates(page, page_size, app_id=app_id, channel_id=channel_id))
 
 
-@router.post("/", response_model=MessageTemplateOut)
+@router.post("/", response_model=None)
 async def create_template(
     payload: MessageTemplateCreate,
     db: AsyncSession = Depends(get_db),
@@ -37,7 +37,7 @@ async def create_template(
     return success(await service.create_template(payload))
 
 
-@router.put("/{template_id}", response_model=MessageTemplateOut)
+@router.put("/{template_id}", response_model=None)
 async def update_template(
     template_id: int,
     payload: MessageTemplateUpdate,

@@ -26,7 +26,7 @@ async def list_users(
     return success(await service.list_users(page, page_size, app_id=app_id))
 
 
-@router.post("/", response_model=UserOut)
+@router.post("/", response_model=None)
 async def create_user(
     payload: UserCreate,
     db: AsyncSession = Depends(get_db),

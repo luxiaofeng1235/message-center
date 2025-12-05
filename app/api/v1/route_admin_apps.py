@@ -25,7 +25,7 @@ async def list_apps(
     return success(await service.list_apps(page, page_size))
 
 
-@router.post("/", response_model=AppOut)
+@router.post("/", response_model=None)
 async def create_app(
     payload: AppCreate,
     db: AsyncSession = Depends(get_db),
@@ -35,7 +35,7 @@ async def create_app(
     return success(await service.create_app(payload))
 
 
-@router.put("/{app_id}", response_model=AppOut)
+@router.put("/{app_id}", response_model=None)
 async def update_app(
     app_id: int,
     payload: AppUpdate,

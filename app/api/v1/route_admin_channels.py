@@ -26,7 +26,7 @@ async def list_channels(
     return success(await service.list_channels(page, page_size, app_id=app_id))
 
 
-@router.post("/", response_model=ChannelOut)
+@router.post("/", response_model=None)
 async def create_channel(
     payload: ChannelCreate,
     db: AsyncSession = Depends(get_db),
@@ -36,7 +36,7 @@ async def create_channel(
     return success(await service.create_channel(payload))
 
 
-@router.put("/{channel_id}", response_model=ChannelOut)
+@router.put("/{channel_id}", response_model=None)
 async def update_channel(
     channel_id: int,
     payload: ChannelUpdate,

@@ -25,7 +25,7 @@ async def list_roles(
     return success(await service.list_roles(page, page_size))
 
 
-@router.post("/", response_model=RoleOut)
+@router.post("/", response_model=None)
 async def create_role(
     payload: RoleCreate,
     db: AsyncSession = Depends(get_db),
@@ -35,7 +35,7 @@ async def create_role(
     return success(await service.create_role(payload))
 
 
-@router.put("/{role_id}", response_model=RoleOut)
+@router.put("/{role_id}", response_model=None)
 async def update_role(
     role_id: int,
     payload: RoleUpdate,

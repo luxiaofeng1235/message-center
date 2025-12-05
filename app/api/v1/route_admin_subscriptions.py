@@ -32,7 +32,7 @@ async def list_subscriptions(
     )
 
 
-@router.post("/", response_model=SubscriptionOut)
+@router.post("/", response_model=None)
 async def create_subscription(
     payload: SubscriptionCreate,
     db: AsyncSession = Depends(get_db),
@@ -42,7 +42,7 @@ async def create_subscription(
     return success(await service.create_subscription(payload))
 
 
-@router.put("/{subscription_id}", response_model=SubscriptionOut)
+@router.put("/{subscription_id}", response_model=None)
 async def update_subscription(
     subscription_id: int,
     payload: SubscriptionUpdate,

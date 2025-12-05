@@ -25,7 +25,7 @@ async def list_message_types(
     return success(await service.list_message_types(page, page_size))
 
 
-@router.post("/", response_model=MessageTypeOut)
+@router.post("/", response_model=None)
 async def create_message_type(
     payload: MessageTypeCreate,
     db: AsyncSession = Depends(get_db),
@@ -35,7 +35,7 @@ async def create_message_type(
     return success(await service.create_message_type(payload))
 
 
-@router.put("/{type_id}", response_model=MessageTypeOut)
+@router.put("/{type_id}", response_model=None)
 async def update_message_type(
     type_id: int,
     payload: MessageTypeUpdate,
