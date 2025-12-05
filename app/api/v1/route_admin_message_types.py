@@ -14,7 +14,7 @@ from app.core.response import success
 router = APIRouter(prefix="/admin/message-types")
 
 
-@router.get("/", response_model=None)
+@router.get("", response_model=None)
 async def list_message_types(
     page: int = 1,
     page_size: int = 20,
@@ -25,7 +25,7 @@ async def list_message_types(
     return success(await service.list_message_types(page, page_size))
 
 
-@router.post("/", response_model=None)
+@router.post("", response_model=None)
 async def create_message_type(
     payload: MessageTypeCreate,
     db: AsyncSession = Depends(get_db),
