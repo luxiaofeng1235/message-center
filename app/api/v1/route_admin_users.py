@@ -9,6 +9,7 @@ from app.api.deps import get_current_admin, get_db
 from app.schemas.admin import AdminCreate, AdminOut, AdminUpdate
 from app.schemas.common import Page
 from app.services.admin.admin_service import AdminService
+from app.core.response import success
 
 router = APIRouter(prefix="/admin/users")
 
@@ -21,7 +22,7 @@ async def list_admins(
     _: object = Depends(get_current_admin),
 ) -> Page[AdminOut]:
     service = AdminService(db)
-    return await service.list_admins(page, page_size)
+    return success(await service.list_admins(page, page_size))
 
 
 @router.post("/", response_model=AdminOut)
@@ -31,7 +32,7 @@ async def create_admin(
     _: object = Depends(get_current_admin),
 ) -> AdminOut:
     service = AdminService(db)
-    return await service.create_admin(payload)
+    return success(await service.create_admin(payload))
 
 
 @router.put("/{admin_id}", response_model=AdminOut)
@@ -42,7 +43,7 @@ async def update_admin(
     _: object = Depends(get_current_admin),
 ) -> AdminOut:
     service = AdminService(db)
-    return await service.update_admin(admin_id, payload)
+    return success(await service.update_admin(admin_id, payload))
 
 
 @router.delete("/{admin_id}")
@@ -53,4 +54,4 @@ async def deactivate_admin(
 ) -> dict[str, str]:
     service = AdminService(db)
     await service.deactivate_admin(admin_id)
-    return {"status": "ok"}
+    return success({"status": "ok"})
