@@ -56,3 +56,6 @@ export const listDeliveries = (params) => api.get('/api/v1/messages/deliveries',
 // Business send message (for测试)
 export const sendMessage = (payload, appSecret) =>
   api.post('/api/v1/messages', payload, { headers: { 'X-App-Secret': appSecret } })
+
+// Instances heartbeat
+export const heartbeat = (payload) => api.post('/api/v1/instances/heartbeat', payload)
