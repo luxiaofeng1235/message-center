@@ -45,18 +45,22 @@
         <el-form-item label="头像">
           <el-upload
             class="avatar-uploader"
+            list-type="picture-card"
             :action="uploadUrl"
             :headers="uploadHeaders"
             :show-file-list="false"
             :on-success="handleUploadSuccess"
             :on-error="handleUploadError"
           >
-            <img v-if="form.avatar" :src="resolveAvatar(form.avatar)" class="avatar" @click.stop="previewAvatar" />
-            <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+            <template v-if="form.avatar">
+              <div class="avatar-wrapper">
+                <img :src="resolveAvatar(form.avatar)" class="avatar" />
+              </div>
+            </template>
+            <template v-else>
+              <el-icon class="avatar-uploader-icon"><Plus /></el-icon>
+            </template>
           </el-upload>
-          <el-dialog v-model="previewVisible" width="30%">
-            <img :src="previewUrl" style="width: 100%" />
-          </el-dialog>
         </el-form-item>
         <el-form-item v-if="form.id" label="原密码" prop="old_password">
           <el-input v-model="form.old_password" type="password" autocomplete="current-password" />
@@ -231,28 +235,45 @@ onMounted(fetchData)
   margin-top: 12px;
   text-align: right;
 }
-.avatar-uploader .el-upload {
-  border: 1px dashed #d9d9d9;
-  border-radius: 6px;
+.avatar-uploader :deep(.el-upload--picture-card),
+.avatar-uploader :deep(.el-upload) {
+  width: 140px;
+  height: 140px;
+  border: 1px dashed #dcdfe6;
+  border-radius: 8px;
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  background: #f5f7fa;
 }
-.avatar-uploader .el-upload:hover {
+.avatar-uploader :deep(.el-upload:hover) {
   border-color: #409eff;
 }
 .avatar-uploader-icon {
   font-size: 28px;
   color: #8c939d;
-  width: 120px;
-  height: 120px;
-  line-height: 120px;
-  text-align: center;
+  width: 100%;
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.avatar-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
 }
 .avatar {
-  width: 120px;
-  height: 120px;
+  width: 100%;
+  height: 100%;
   display: block;
   object-fit: cover;
+  border-radius: 6px;
+}
+.avatar-preview {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  padding: 0 6px;
 }
 </style>
