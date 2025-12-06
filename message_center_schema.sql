@@ -216,6 +216,7 @@ CREATE TABLE `mc_message`  (
   `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '标题',
   `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '消息文本内容',
   `payload` json NULL COMMENT '结构化数据(JSON)，可用于客户端自定义渲染',
+  `sender_user_id` bigint UNSIGNED NULL DEFAULT NULL COMMENT '发送方用户ID，可为空',
   `priority` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '优先级 0-9，数值越大优先级越高',
   `dispatch_mode` tinyint(1) NOT NULL DEFAULT 0 COMMENT '派发模式：0=按订阅 1=单播/定向 2=广播',
   `target_user_ids` json NULL COMMENT '单播/定向目标用户ID数组',

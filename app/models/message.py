@@ -17,6 +17,7 @@ class Message(Base):
     title = Column(String(255))
     content = Column(Text, nullable=False)
     payload = Column(JSON)
+    sender_user_id = Column(String(128))
     priority = Column(Integer, default=0, nullable=False)
     dispatch_mode = Column(Integer, default=0, nullable=False)
     target_user_ids = Column(JSON)

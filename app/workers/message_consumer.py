@@ -45,6 +45,7 @@ async def handle_message(db: AsyncSession, raw: str) -> None:
     dispatch_mode = payload.get("dispatch_mode", 0)
     user_ids = payload.get("user_ids", [])
     target_user_ids = payload.get("target_user_ids") or []
+    sender_user_id = payload.get("sender_user_id")
     message = await db.get(Message, message_id)
     if not message:
         return
@@ -73,6 +74,20 @@ async def handle_message(db: AsyncSession, raw: str) -> None:
                 )
             )
             await db.commit()
+    # 给发送者推送发送确认事件（如在线）
+    if sender_user_id and manager.is_online(sender_user_id):
+        await manager.send_personal_message(
+            sender_user_id,
+            json.dumps(
+                {
+                    "event": "message_sent",
+                    "message_id": message.id,
+                    "channel_id": message.channel_id,
+                    "dispatch_mode": dispatch_mode,
+                    "status": message.status,
+                }
+            ),
+        )
 
 
 async def resend_pending(interval: float = 5.0) -> None:

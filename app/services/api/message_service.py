@@ -82,6 +82,7 @@ class MessageService:
             title=payload.title,
             content=payload.content,
             payload=payload.payload,
+            sender_user_id=payload.sender_user_id,
             priority=payload.priority,
             dispatch_mode=dispatch_mode,
             target_user_ids=target_user_ids or None,
@@ -141,6 +142,7 @@ class MessageService:
                     "priority": payload.priority,
                     "dispatch_mode": dispatch_mode,
                     "target_user_ids": target_user_ids,
+                    "sender_user_id": payload.sender_user_id,
                     "user_ids": user_ids,
                 }
             ),

@@ -10,6 +10,7 @@ class MessageCreate(BaseModel):
     title: str | None = None
     content: str
     payload: dict | None = None
+    sender_user_id: str | None = None
     priority: int = 0
     message_key: str | None = None
     dispatch_mode: int | None = Field(default=None, ge=0, le=2)
@@ -30,6 +31,7 @@ class MessageOut(BaseModel):
     title: str | None = None
     content: str
     payload: dict | None = None
+    sender_user_id: str | None = None
     priority: int
     dispatch_mode: int
     target_user_ids: list[int] | None = None
