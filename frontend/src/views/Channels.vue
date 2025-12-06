@@ -172,9 +172,9 @@ const pageChange = (p) => {
 }
 
 const modeLabel = (mode) => {
-  if (mode === 1) return '广播在线'
-  if (mode === 2) return '广播所有'
-  return '按订阅'
+  if (mode === 1) return '单播（一对一）'
+  if (mode === 2) return '广播（全部）'
+  return '订阅模式'
 }
 
 onMounted(fetchData)

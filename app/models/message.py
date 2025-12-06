@@ -18,6 +18,8 @@ class Message(Base):
     content = Column(Text, nullable=False)
     payload = Column(JSON)
     priority = Column(Integer, default=0, nullable=False)
+    dispatch_mode = Column(Integer, default=0, nullable=False)
+    target_user_ids = Column(JSON)
     status = Column(Integer, default=0, nullable=False)
     error_msg = Column(String(255))
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)

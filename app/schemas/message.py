@@ -12,6 +12,8 @@ class MessageCreate(BaseModel):
     payload: dict | None = None
     priority: int = 0
     message_key: str | None = None
+    dispatch_mode: int | None = Field(default=None, ge=0, le=2)
+    target_user_ids: list[int] | None = None
 
 
 class MessageSendResponse(BaseModel):
@@ -29,6 +31,8 @@ class MessageOut(BaseModel):
     content: str
     payload: dict | None = None
     priority: int
+    dispatch_mode: int
+    target_user_ids: list[int] | None = None
     status: int
     message_key: str | None = None
     created_at: datetime | None = None
