@@ -12,6 +12,7 @@ class AdminUser(Base):
     id = Column(BIGINT(unsigned=True), primary_key=True, autoincrement=True)
     username = Column(String(64), unique=True, nullable=False)
     password_hash = Column(String(255), nullable=False)
+    avatar = Column(String(255))
     display_name = Column(String(128))
     phone = Column(String(32))
     is_super = Column(Boolean, default=False, nullable=False)

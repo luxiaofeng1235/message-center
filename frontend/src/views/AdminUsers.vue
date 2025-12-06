@@ -5,6 +5,11 @@
     </div>
     <el-table :data="items" style="width: 100%">
       <el-table-column prop="id" label="ID" width="80" />
+      <el-table-column label="头像" width="90">
+        <template #default="scope">
+          <el-avatar :size="36" :src="resolveAvatar(scope.row.avatar)" />
+        </template>
+      </el-table-column>
       <el-table-column prop="username" label="用户名" />
       <el-table-column prop="display_name" label="名称" />
       <el-table-column prop="is_super" label="超级">
@@ -36,6 +41,24 @@
       <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="用户名" prop="username">
           <el-input v-model="form.username" :disabled="!!form.id" />
+        </el-form-item>
+        <el-form-item label="头像">
+          <el-upload
+            list-type="picture-card"
+            :action="uploadUrl"
+            :headers="uploadHeaders"
+            :file-list="fileList"
+            :on-success="handleUploadSuccess"
+            :on-error="handleUploadError"
+            :on-preview="handlePreview"
+            :on-remove="handleRemove"
+            :limit="1"
+          >
+            <el-icon><Plus /></el-icon>
+          </el-upload>
+          <el-dialog v-model="previewVisible" width="30%">
+            <img :src="previewUrl" style="width: 100%" />
+          </el-dialog>
         </el-form-item>
         <el-form-item v-if="form.id" label="原密码" prop="old_password">
           <el-input v-model="form.old_password" type="password" autocomplete="current-password" />
@@ -69,6 +92,7 @@ import { reactive, ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { listAdminUsers, createAdminUser, updateAdminUser } from '../api'
 import { useAuthStore } from '../stores/auth'
+import { Plus } from '@element-plus/icons-vue'
 
 const items = ref([])
 const meta = reactive({ total: 0, page: 1, page_size: 20 })
@@ -80,10 +104,12 @@ const form = reactive({
   password: '',
   old_password: '',
   display_name: '',
+  avatar: '',
   phone: '',
   is_super: false,
   is_active: true,
 })
+const fileList = ref([])
 const rules = {
   username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
   password: [
@@ -120,6 +146,7 @@ const openForm = (row = null) => {
   formRef.value?.clearValidate()
   if (row) {
     Object.assign(form, { ...row, password: '', old_password: '' })
+    fileList.value = row.avatar ? [{ name: 'avatar', url: resolveAvatar(row.avatar) }] : []
   } else {
     Object.assign(form, {
       id: null,
@@ -127,10 +154,12 @@ const openForm = (row = null) => {
       password: '',
       old_password: '',
       display_name: '',
+      avatar: '',
       phone: '',
       is_super: false,
       is_active: true,
     })
+    fileList.value = []
   }
 }
 
@@ -164,6 +193,37 @@ const toggleActive = async (row) => {
 const pageChange = (p) => {
   meta.page = p
   fetchData()
+}
+
+const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:9000'
+const uploadUrl = `${apiBase}/api/v1/admin/users/avatar`
+const uploadHeaders = { Authorization: auth.token ? `Bearer ${auth.token}` : '' }
+const resolveAvatar = (url) => {
+  if (!url) return ''
+  if (url.startsWith('http')) return url
+  return `${apiBase}${url}`
+}
+const handleUploadSuccess = (res) => {
+  if (res?.code === 1 && res.data?.url) {
+    form.avatar = res.data.url
+    fileList.value = [{ name: 'avatar', url: resolveAvatar(res.data.url) }]
+    ElMessage.success('上传成功')
+  } else {
+    ElMessage.error(res?.msg || '上传失败')
+  }
+}
+const handleUploadError = (err) => {
+  ElMessage.error(err?.message || '上传失败')
+}
+const previewVisible = ref(false)
+const previewUrl = ref('')
+const handlePreview = (file) => {
+  previewUrl.value = file.url
+  previewVisible.value = true
+}
+const handleRemove = () => {
+  form.avatar = ''
+  fileList.value = []
 }
 
 onMounted(fetchData)

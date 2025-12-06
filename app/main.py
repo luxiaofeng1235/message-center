@@ -1,5 +1,8 @@
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.api import deps  # noqa: F401  # side-effect imports for dependencies
 from app.api.v1 import router as api_router
@@ -16,6 +19,10 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    static_dir = Path("public")
+    static_dir.mkdir(parents=True, exist_ok=True)
+    app.mount("/public", StaticFiles(directory=str(static_dir)), name="public")
+
     @app.get("/")
     async def root():
         return success({"service": "Message Center", "status": "ok"})

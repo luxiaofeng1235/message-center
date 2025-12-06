@@ -45,6 +45,7 @@ CREATE TABLE `mc_admin_user`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
   `username` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '登录名',
   `password_hash` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '密码哈希（如 bcrypt/argon2）',
+  `avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '用户头像',
   `display_name` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '展示名称',
   `phone` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '手机号',
   `is_super` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否超级管理员 1=是 0=否',
@@ -60,7 +61,7 @@ CREATE TABLE `mc_admin_user`  (
 -- ----------------------------
 -- Records of mc_admin_user
 -- ----------------------------
-INSERT INTO `mc_admin_user` VALUES (1, 'admin', '$2b$12$oaobiIPoFhjcLJexAUgyce4luAWJ53iXoG10PzL/.sjoNVxjBkt7W', '王掌柜', '15637928033', 1, 1, '127.0.0.1', '2025-12-05 09:58:13', '2025-12-05 16:32:18', '2025-12-05 09:58:13');
+INSERT INTO `mc_admin_user` VALUES (1, 'admin', '$2b$12$oaobiIPoFhjcLJexAUgyce4luAWJ53iXoG10PzL/.sjoNVxjBkt7W', NULL, '王掌柜', '15637928033', 1, 1, '127.0.0.1', '2025-12-05 09:58:13', '2025-12-05 16:32:18', '2025-12-05 09:58:13');
 
 -- ----------------------------
 -- Table structure for mc_admin_user_role

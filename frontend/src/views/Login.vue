@@ -62,7 +62,9 @@ const onSubmit = async () => {
   loading.value = true
   try {
     await formRef.value.validate()
+    // 先登录拿 token，再带 token 获取个人信息
     const data = await login(form)
+    auth.setAuth(data.access_token, null) // 先写入 token，让后续请求带上 Authorization
     const profile = await getProfile()
     auth.setAuth(data.access_token, profile)
     router.push('/')

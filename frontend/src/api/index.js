@@ -10,6 +10,8 @@ export const listAdminUsers = (params) => api.get('/api/v1/admin/users', { param
 export const createAdminUser = (payload) => api.post('/api/v1/admin/users', payload)
 export const updateAdminUser = (id, payload) => api.put(`/api/v1/admin/users/${id}`, payload)
 export const deactivateAdminUser = (id) => api.delete(`/api/v1/admin/users/${id}`)
+export const uploadAdminAvatar = (formData) =>
+  api.post('/api/v1/admin/users/avatar', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
 
 // Roles
 export const listRoles = (params) => api.get('/api/v1/admin/roles', { params })

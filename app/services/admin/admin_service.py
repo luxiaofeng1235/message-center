@@ -46,6 +46,7 @@ class AdminService:
         admin = AdminUser(
             username=data.username,
             password_hash=get_password_hash(data.password),
+            avatar=data.avatar,
             display_name=data.display_name,
             phone=data.phone,
             is_super=data.is_super,
@@ -73,6 +74,8 @@ class AdminService:
             admin.is_super = data.is_super
         if data.is_active is not None:
             admin.is_active = data.is_active
+        if data.avatar is not None:
+            admin.avatar = data.avatar
         if data.password:
             # 任何修改密码的操作都需提供原密码并校验
             if not data.old_password or not verify_password(data.old_password, admin.password_hash):

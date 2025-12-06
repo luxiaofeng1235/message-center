@@ -2,7 +2,10 @@
 更新日期: 2025-12-05
 """
 
-from fastapi import APIRouter, Depends
+import uuid
+from pathlib import Path
+
+from fastapi import APIRouter, Depends, File, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_admin, get_db
@@ -12,6 +15,8 @@ from app.services.admin.admin_service import AdminService
 from app.core.response import success
 
 router = APIRouter(prefix="/admin/users")
+AVATAR_DIR = Path("public/avatar")
+AVATAR_DIR.mkdir(parents=True, exist_ok=True)
 
 
 @router.get("", response_model=None)
@@ -55,3 +60,18 @@ async def deactivate_admin(
     service = AdminService(db)
     await service.deactivate_admin(admin_id, current_admin)
     return success({"status": "ok"})
+
+
+@router.post("/avatar", response_model=None)
+async def upload_avatar(
+    file: UploadFile = File(...),
+    _: object = Depends(get_current_admin),
+):
+    suffix = Path(file.filename).suffix or ".jpg"
+    filename = f"{uuid.uuid4().hex}{suffix}"
+    AVATAR_DIR.mkdir(parents=True, exist_ok=True)
+    target = AVATAR_DIR / filename
+    content = await file.read()
+    target.write_bytes(content)
+    url = f"/public/avatar/{filename}"
+    return success({"url": url})
