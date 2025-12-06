@@ -38,6 +38,10 @@ export const listChannelMessageTypes = (params) => api.get('/api/v1/admin/channe
 export const createChannelMessageType = (payload) => api.post('/api/v1/admin/channel-message-types', payload)
 export const updateChannelMessageType = (id, payload) =>
   api.put(`/api/v1/admin/channel-message-types/${id}`, payload)
+// Channels and Message Types for selects
+export const listChannelsAll = () => api.get('/api/v1/admin/channels', { params: { page: 1, page_size: 1000 } })
+export const listMessageTypesAll = () =>
+  api.get('/api/v1/admin/message-types', { params: { page: 1, page_size: 1000 } })
 
 // Templates
 export const listTemplates = (params) => api.get('/api/v1/admin/templates', { params })
