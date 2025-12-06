@@ -73,6 +73,7 @@ class TemplateService:
             tpl.payload_template = data.payload_template
         if data.is_default is not None:
             tpl.is_default = data.is_default
+        tpl.updated_at = datetime.utcnow()
         await self.db.commit()
         await self.db.refresh(tpl)
         return MessageTemplateOut.model_validate(tpl, from_attributes=True)

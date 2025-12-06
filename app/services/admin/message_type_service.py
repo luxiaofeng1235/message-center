@@ -57,6 +57,7 @@ class MessageTypeService:
             mt.description = data.description
         if data.is_active is not None:
             mt.is_active = data.is_active
+        mt.updated_at = datetime.utcnow()
         await self.db.commit()
         await self.db.refresh(mt)
         return MessageTypeOut.model_validate(mt, from_attributes=True)

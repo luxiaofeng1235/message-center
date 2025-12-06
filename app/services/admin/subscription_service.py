@@ -102,6 +102,7 @@ class SubscriptionService:
             sub.is_active = data.is_active
         if data.source is not None:
             sub.source = data.source
+        sub.updated_at = datetime.utcnow()
         await self.db.commit()
         await self.db.refresh(sub)
         return SubscriptionOut.model_validate(sub, from_attributes=True)

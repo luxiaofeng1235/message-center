@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Sequence
 
 from fastapi import HTTPException, status
@@ -53,6 +54,7 @@ class AppService:
             app.description = data.description
         if data.is_active is not None:
             app.is_active = data.is_active
+        app.updated_at = datetime.utcnow()
         await self.db.commit()
         await self.db.refresh(app)
         return AppOut.model_validate(app, from_attributes=True)
