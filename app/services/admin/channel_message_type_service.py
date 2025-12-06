@@ -41,7 +41,7 @@ class ChannelMessageTypeService:
 
     async def create_item(self, data: ChannelMessageTypeCreate) -> ChannelMessageTypeOut:
         exists = await self.db.scalar(
-            select(ChannelMessageType).where(
+            select(ChannelMessageType.id).where(
                 and_(
                     ChannelMessageType.channel_id == data.channel_id,
                     ChannelMessageType.message_type_id == data.message_type_id,
@@ -49,7 +49,7 @@ class ChannelMessageTypeService:
             )
         )
         if exists:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Mapping exists")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="该通道已绑定该消息类型")
         item = ChannelMessageType(
             channel_id=data.channel_id,
             message_type_id=data.message_type_id,

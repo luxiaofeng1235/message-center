@@ -35,7 +35,7 @@
     <el-dialog v-model="visible" title="通道消息类型">
       <el-form ref="formRef" :model="form" :rules="rules" label-width="90px">
         <el-form-item label="通道" prop="channel_id">
-          <el-select v-model="form.channel_id" placeholder="请选择通道" filterable>
+          <el-select v-model="form.channel_id" placeholder="请选择" clearable>
             <el-option
               v-for="ch in channelOptions"
               :key="ch.value"
@@ -45,7 +45,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="消息类型" prop="message_type_id">
-          <el-select v-model="form.message_type_id" placeholder="请选择消息类型" filterable>
+          <el-select v-model="form.message_type_id" placeholder="请选择" clearable>
             <el-option
               v-for="mt in messageTypeOptions"
               :key="mt.value"
