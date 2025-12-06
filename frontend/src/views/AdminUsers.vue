@@ -213,16 +213,6 @@ const handleUploadSuccess = (res) => {
 const handleUploadError = (err) => {
   ElMessage.error(err?.message || '上传失败')
 }
-const previewVisible = ref(false)
-const previewUrl = ref('')
-const previewAvatar = () => {
-  if (!form.avatar) return
-  previewUrl.value = resolveAvatar(form.avatar)
-  previewVisible.value = true
-}
-const handleRemove = () => {
-  form.avatar = ''
-}
 
 onMounted(fetchData)
 </script>
@@ -269,11 +259,5 @@ onMounted(fetchData)
   display: block;
   object-fit: cover;
   border-radius: 6px;
-}
-.avatar-preview {
-  position: absolute;
-  right: 6px;
-  bottom: 6px;
-  padding: 0 6px;
 }
 </style>
