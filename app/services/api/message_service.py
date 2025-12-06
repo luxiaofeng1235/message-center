@@ -69,6 +69,11 @@ class MessageService:
             if exists_key:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Duplicate message key")
 
+        dispatch_mode = payload.dispatch_mode if payload.dispatch_mode is not None else getattr(channel, "dispatch_mode", 0)
+        target_user_ids: list[int] = payload.target_user_ids or []
+        if dispatch_mode == 1 and not target_user_ids:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="target_user_ids required for single")
+
         message = Message(
             app_id=payload.app_id,
             channel_id=payload.channel_id,
@@ -78,22 +83,31 @@ class MessageService:
             content=payload.content,
             payload=payload.payload,
             priority=payload.priority,
+            dispatch_mode=dispatch_mode,
+            target_user_ids=target_user_ids or None,
             status=0,
             created_at=datetime.utcnow(),
         )
         self.db.add(message)
         await self.db.flush()
 
-        subs_result = await self.db.execute(
-            select(Subscription.user_id).where(
-                and_(
-                    Subscription.channel_id == payload.channel_id,
-                    Subscription.is_active.is_(True),
-                    Subscription.message_type_id == payload.message_type_id,
+        # 生成投递列表
+        user_ids: list[int] = []
+        if dispatch_mode == 1:
+            user_ids = target_user_ids
+        else:
+            subs_result = await self.db.execute(
+                select(Subscription.user_id).where(
+                    and_(
+                        Subscription.channel_id == payload.channel_id,
+                        Subscription.is_active.is_(True),
+                        Subscription.message_type_id == payload.message_type_id,
+                    )
                 )
             )
-        )
-        user_ids = [row[0] for row in subs_result.all()]
+            user_ids = [row[0] for row in subs_result.all()]
+        # 广播模式（2）如需脱离订阅，可在此扩展，例如查询全部用户
+
         deliveries: list[MessageDelivery] = []
         for uid in user_ids:
             deliveries.append(
@@ -125,6 +139,8 @@ class MessageService:
                     "content": payload.content,
                     "payload": payload.payload,
                     "priority": payload.priority,
+                    "dispatch_mode": dispatch_mode,
+                    "target_user_ids": target_user_ids,
                     "user_ids": user_ids,
                 }
             ),

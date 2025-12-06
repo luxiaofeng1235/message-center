@@ -213,6 +213,8 @@ CREATE TABLE `mc_message`  (
   `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '消息文本内容',
   `payload` json NULL COMMENT '结构化数据(JSON)，可用于客户端自定义渲染',
   `priority` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '优先级 0-9，数值越大优先级越高',
+  `dispatch_mode` tinyint(1) NOT NULL DEFAULT 0 COMMENT '派发模式：0=按订阅 1=单播/定向 2=广播',
+  `target_user_ids` json NULL COMMENT '单播/定向目标用户ID数组',
   `status` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '状态 0=已接收 1=已入队/已发布 2=发送失败',
   `error_msg` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '失败原因',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间（接收时间）',

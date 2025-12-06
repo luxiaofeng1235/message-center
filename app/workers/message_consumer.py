@@ -42,11 +42,17 @@ async def _send_delivery(db: AsyncSession, delivery: MessageDelivery, message: M
 async def handle_message(db: AsyncSession, raw: str) -> None:
     payload = json.loads(raw)
     message_id = payload.get("message_id")
+    dispatch_mode = payload.get("dispatch_mode", 0)
     user_ids = payload.get("user_ids", [])
+    target_user_ids = payload.get("target_user_ids") or []
     message = await db.get(Message, message_id)
     if not message:
         return
-    for uid in user_ids:
+    if dispatch_mode == 1:
+        target_list = target_user_ids
+    else:
+        target_list = user_ids
+    for uid in target_list:
         delivery = await db.scalar(
             select(MessageDelivery).where(
                 and_(MessageDelivery.user_id == uid, MessageDelivery.message_id == message_id)
