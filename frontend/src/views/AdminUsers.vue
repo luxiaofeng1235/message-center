@@ -48,11 +48,12 @@
             :action="uploadUrl"
             :headers="uploadHeaders"
             :file-list="fileList"
+            :multiple="false"
+            :limit="2"
             :on-success="handleUploadSuccess"
             :on-error="handleUploadError"
             :on-preview="handlePreview"
             :on-remove="handleRemove"
-            :limit="1"
           >
             <el-icon><Plus /></el-icon>
           </el-upload>
