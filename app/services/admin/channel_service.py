@@ -46,6 +46,8 @@ class ChannelService:
             name=data.name,
             description=data.description,
             is_active=data.is_active,
+            dispatch_mode=data.dispatch_mode,
+            broadcast_filter=data.broadcast_filter,
         )
         self.db.add(channel)
         await self.db.commit()
@@ -63,6 +65,10 @@ class ChannelService:
             channel.description = data.description
         if data.is_active is not None:
             channel.is_active = data.is_active
+        if data.dispatch_mode is not None:
+            channel.dispatch_mode = data.dispatch_mode
+        if data.broadcast_filter is not None:
+            channel.broadcast_filter = data.broadcast_filter
         channel.updated_at = datetime.utcnow()
         await self.db.commit()
         await self.db.refresh(channel)
