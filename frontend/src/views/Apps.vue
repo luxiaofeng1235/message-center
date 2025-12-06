@@ -41,6 +41,13 @@
             <el-button size="small" type="primary" plain @click="genSecret">生成 32 位随机密钥</el-button>
           </div>
         </el-form-item>
+        <el-form-item label="运行模式" prop="mode">
+          <el-radio-group v-model="form.mode">
+            <el-radio :label="0">普通模式</el-radio>
+            <el-radio :label="1">客服模式</el-radio>
+            <el-radio :label="2">扩展模式</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="说明">
           <el-input v-model="form.description" />
         </el-form-item>
@@ -71,6 +78,7 @@ const form = reactive({
   name: '',
   code: '',
   secret: '',
+  mode: 0,
   description: '',
   is_active: true,
 })
@@ -78,6 +86,7 @@ const rules = {
   name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
   code: [{ required: true, message: '请输入编码', trigger: 'blur' }],
   secret: [{ required: true, message: '请输入密钥', trigger: 'blur' }],
+  mode: [{ required: true, message: '请选择运行模式', trigger: 'change' }],
 }
 
 const fetchData = async () => {
@@ -92,7 +101,7 @@ const openForm = (row = null) => {
   if (row) {
     Object.assign(form, row)
   } else {
-    Object.assign(form, { id: null, name: '', code: '', secret: '', description: '', is_active: true })
+    Object.assign(form, { id: null, name: '', code: '', secret: '', mode: 0, description: '', is_active: true })
   }
 }
 
