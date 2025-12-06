@@ -13,6 +13,8 @@ class ClientConnection(Base):
     user_id = Column(BIGINT(unsigned=True), nullable=False)
     instance_id = Column(BIGINT(unsigned=True), nullable=False)
     client_id = Column(String(128))
+    role = Column(String(32))
+    token = Column(String(255))
     user_agent = Column(String(255))
     ip = Column(String(45))
     connected_at = Column(DateTime, default=datetime.utcnow, nullable=False)

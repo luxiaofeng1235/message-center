@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, String
+from sqlalchemy import Boolean, Column, DateTime, String, Integer, JSON
 from sqlalchemy.dialects.mysql import BIGINT
 
 from app.db.base import Base
@@ -15,6 +15,8 @@ class App(Base):
     secret = Column(String(128), nullable=False)
     description = Column(String(255))
     is_active = Column(Boolean, default=True, nullable=False)
+    mode = Column(Integer, default=0, nullable=False)
+    mode_config = Column(JSON)
     created_by = Column(BIGINT(unsigned=True))
     updated_by = Column(BIGINT(unsigned=True))
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)

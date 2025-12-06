@@ -35,6 +35,8 @@ class AppService:
             secret=data.secret,
             description=data.description,
             is_active=data.is_active,
+            mode=data.mode,
+            mode_config=data.mode_config,
         )
         self.db.add(app)
         await self.db.commit()
@@ -54,6 +56,10 @@ class AppService:
             app.description = data.description
         if data.is_active is not None:
             app.is_active = data.is_active
+        if data.mode is not None:
+            app.mode = data.mode
+        if data.mode_config is not None:
+            app.mode_config = data.mode_config
         app.updated_at = datetime.utcnow()
         await self.db.commit()
         await self.db.refresh(app)

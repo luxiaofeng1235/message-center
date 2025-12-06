@@ -33,6 +33,8 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
     instance_id = websocket.query_params.get("instance_id")
     app_id = websocket.query_params.get("app_id")
     channel_id = websocket.query_params.get("channel_id")
+    token = websocket.query_params.get("token")
+    role = websocket.query_params.get("role")
     try:
         uid = int(user_id)
         iid = int(instance_id)
@@ -41,7 +43,7 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
     except (TypeError, ValueError):
         await websocket.close(code=1008)
         return
-    if not uid or not iid or not aid or not cid:
+    if not uid or not iid or not aid or not cid or not token:
         await websocket.close(code=1008)
         return
     await manager.connect(uid, websocket)
@@ -52,6 +54,10 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
         if not app_obj or not app_obj.is_active:
             await websocket.close(code=1008)
             return
+        if getattr(app_obj, "mode", 0) == 1:
+            if not role:
+                await websocket.close(code=1008)
+                return
         channel = await db.get(Channel, cid)
         if not channel or not channel.is_active or channel.app_id != aid:
             await websocket.close(code=1008)
@@ -64,6 +70,8 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
             user_id=uid,
             instance_id=iid,
             client_id=client_id,
+            role=role,
+            token=token,
             user_agent=websocket.headers.get("user-agent"),
             ip=websocket.client.host if websocket.client else None,
             connected_at=datetime.utcnow(),
