@@ -5,6 +5,7 @@ import Layout from '../views/Layout.vue'
 import Dashboard from '../views/Dashboard.vue'
 import AdminUsers from '../views/AdminUsers.vue'
 import Roles from '../views/Roles.vue'
+import AdminUserRoles from '../views/AdminUserRoles.vue'
 import Apps from '../views/Apps.vue'
 import Channels from '../views/Channels.vue'
 import MessageTypes from '../views/MessageTypes.vue'
@@ -27,6 +28,7 @@ const routes = [
       { path: '', name: 'dashboard', component: Dashboard },
       { path: 'admin-users', name: 'admin-users', component: AdminUsers },
       { path: 'roles', name: 'roles', component: Roles },
+      { path: 'admin-user-roles', name: 'admin-user-roles', component: AdminUserRoles },
       { path: 'apps', name: 'apps', component: Apps },
       { path: 'channels', name: 'channels', component: Channels },
       { path: 'message-types', name: 'message-types', component: MessageTypes },

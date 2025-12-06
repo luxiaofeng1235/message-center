@@ -9,6 +9,7 @@ from app.api.v1 import (
     route_admin_roles,
     route_admin_subscriptions,
     route_admin_templates,
+    route_admin_user_roles,
     route_admin_users,
     route_admin_user_mappings,
     route_health,
@@ -26,6 +27,7 @@ router.include_router(route_admin_channel_message_types.router, tags=["channel-m
 router.include_router(route_admin_message_types.router, tags=["message-types"])
 router.include_router(route_admin_templates.router, tags=["message-templates"])
 router.include_router(route_admin_subscriptions.router, tags=["subscriptions"])
+router.include_router(route_admin_user_roles.router, tags=["user-roles"])
 router.include_router(route_admin_user_mappings.router, tags=["users"])
 router.include_router(route_messages.router, tags=["messages"])
 router.include_router(route_instances.router, tags=["instances"])

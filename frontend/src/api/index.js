@@ -43,6 +43,11 @@ export const listChannelsAll = () => api.get('/api/v1/admin/channels', { params:
 export const listMessageTypesAll = () =>
   api.get('/api/v1/admin/message-types', { params: { page: 1, page_size: 1000 } })
 
+// Admin user - role mapping
+export const listAdminUserRoles = (params) => api.get('/api/v1/admin/user-roles', { params })
+export const createAdminUserRole = (payload) => api.post('/api/v1/admin/user-roles', payload)
+export const deleteAdminUserRole = (id) => api.delete(`/api/v1/admin/user-roles/${id}`)
+
 // Templates
 export const listTemplates = (params) => api.get('/api/v1/admin/templates', { params })
 export const createTemplate = (payload) => api.post('/api/v1/admin/templates', payload)

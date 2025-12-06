@@ -6,6 +6,7 @@
         <el-menu-item index="/">仪表盘</el-menu-item>
         <el-menu-item index="/admin-users">管理员</el-menu-item>
         <el-menu-item index="/roles">角色</el-menu-item>
+        <el-menu-item index="/admin-user-roles">管理员角色绑定</el-menu-item>
         <el-menu-item index="/apps">业务系统</el-menu-item>
         <el-menu-item index="/channels">通道</el-menu-item>
         <el-menu-item index="/message-types">消息类型</el-menu-item>
