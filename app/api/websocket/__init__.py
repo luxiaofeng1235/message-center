@@ -111,6 +111,10 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
             data = await websocket.receive_text()
             try:
                 payload = json.loads(data)
+                # 简单心跳：收到 type=ping 或文本 "ping" 返回 "PONG"
+                if (isinstance(payload, dict) and payload.get("type") == "ping") or data.strip().lower() == "ping":
+                    await websocket.send_text("PONG")
+                    continue
                 delivery_id = payload.get("delivery_id")
                 status = payload.get("status")
                 if delivery_id is not None and status is not None:
