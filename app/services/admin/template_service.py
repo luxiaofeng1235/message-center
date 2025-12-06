@@ -2,6 +2,7 @@
 更新日期: 2025-12-05
 """
 
+from datetime import datetime
 from typing import Sequence
 
 from fastapi import HTTPException, status
