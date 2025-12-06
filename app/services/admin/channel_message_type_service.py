@@ -73,6 +73,7 @@ class ChannelMessageTypeService:
             item.config = data.config
         if data.is_active is not None:
             item.is_active = data.is_active
+        item.updated_at = datetime.utcnow()
         await self.db.commit()
         await self.db.refresh(item)
         return ChannelMessageTypeOut.model_validate(item, from_attributes=True)

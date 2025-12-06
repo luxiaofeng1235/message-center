@@ -62,6 +62,7 @@ class ChannelService:
             channel.description = data.description
         if data.is_active is not None:
             channel.is_active = data.is_active
+        channel.updated_at = datetime.utcnow()
         await self.db.commit()
         await self.db.refresh(channel)
         return ChannelOut.model_validate(channel, from_attributes=True)
