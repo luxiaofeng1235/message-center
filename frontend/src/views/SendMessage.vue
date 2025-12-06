@@ -1,14 +1,30 @@
 <template>
   <el-card>
     <el-form ref="formRef" :model="form" :rules="rules" label-width="120px">
-      <el-form-item label="AppID" prop="app_id">
-        <el-input v-model.number="form.app_id" />
+      <el-form-item label="App" prop="app_id">
+        <el-select v-model="form.app_id" placeholder="请选择" filterable clearable @change="onAppChange">
+          <el-option v-for="app in appOptions" :key="app.value" :label="app.label" :value="app.value" />
+        </el-select>
       </el-form-item>
-      <el-form-item label="通道ID" prop="channel_id">
-        <el-input v-model.number="form.channel_id" />
+      <el-form-item label="通道" prop="channel_id">
+        <el-select v-model="form.channel_id" placeholder="请选择" filterable clearable @change="onChannelChange">
+          <el-option
+            v-for="ch in channelOptions"
+            :key="ch.value"
+            :label="ch.label"
+            :value="ch.value"
+          />
+        </el-select>
       </el-form-item>
-      <el-form-item label="消息类型ID" prop="message_type_id">
-        <el-input v-model.number="form.message_type_id" />
+      <el-form-item label="消息类型" prop="message_type_id">
+        <el-select v-model="form.message_type_id" placeholder="请选择" filterable clearable>
+          <el-option
+            v-for="mt in messageTypeOptions"
+            :key="mt.value"
+            :label="mt.label"
+            :value="mt.value"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item label="标题">
         <el-input v-model="form.title" />
@@ -38,9 +54,9 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { sendMessage } from '../api'
+import { sendMessage, listApps, listChannels, listChannelMessageTypes } from '../api'
 
 const form = reactive({
   app_id: null,
@@ -57,11 +73,55 @@ const result = ref(null)
 const loading = ref(false)
 const formRef = ref()
 const rules = {
-  app_id: [{ required: true, message: '请输入AppID', trigger: 'blur' }],
-  channel_id: [{ required: true, message: '请输入通道ID', trigger: 'blur' }],
-  message_type_id: [{ required: true, message: '请输入消息类型ID', trigger: 'blur' }],
+  app_id: [{ required: true, message: '请选择App', trigger: 'change' }],
+  channel_id: [{ required: true, message: '请选择通道', trigger: 'change' }],
+  message_type_id: [{ required: true, message: '请选择消息类型', trigger: 'change' }],
   content: [{ required: true, message: '请输入内容', trigger: 'blur' }],
   app_secret: [{ required: true, message: '请输入X-App-Secret', trigger: 'blur' }],
+}
+
+const appOptions = ref([])
+const channelOptions = ref([])
+const messageTypeOptions = ref([])
+
+const loadApps = async () => {
+  const res = await listApps({ page: 1, page_size: 1000 })
+  appOptions.value = (res.items || []).map((a) => ({
+    value: a.id,
+    label: `${a.name || ''} (ID:${a.id})`,
+  }))
+}
+
+const loadChannels = async (appId) => {
+  const res = await listChannels({ page: 1, page_size: 1000, app_id: appId || undefined })
+  channelOptions.value = (res.items || []).map((c) => ({
+    value: c.id,
+    label: `${c.name || ''} (ID:${c.id})`,
+  }))
+}
+
+const loadMessageTypes = async (channelId) => {
+  if (!channelId) {
+    messageTypeOptions.value = []
+    return
+  }
+  const res = await listChannelMessageTypes({ page: 1, page_size: 1000, channel_id: channelId })
+  messageTypeOptions.value = (res.items || []).map((m) => ({
+    value: m.message_type_id,
+    label: `${m.message_type_name || ''} (ID:${m.message_type_id})`,
+  }))
+}
+
+const onAppChange = async (appId) => {
+  form.channel_id = null
+  form.message_type_id = null
+  await loadChannels(appId)
+  messageTypeOptions.value = []
+}
+
+const onChannelChange = async (channelId) => {
+  form.message_type_id = null
+  await loadMessageTypes(channelId)
 }
 
 const send = async () => {
@@ -83,4 +143,8 @@ const send = async () => {
     loading.value = false
   }
 }
+
+onMounted(async () => {
+  await loadApps()
+})
 </script>
