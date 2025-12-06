@@ -3,6 +3,7 @@
 """
 
 import json
+import uuid
 from datetime import datetime
 from typing import Sequence
 
@@ -64,10 +65,21 @@ class MessageService:
         )
         if not mapping:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Message type not allowed for channel")
-        if payload.message_key:
-            exists_key = await self.db.scalar(select(Message).where(Message.message_key == payload.message_key))
+
+        # 生成/校验 message_key（业务幂等键，由中台生成或校验）
+        message_key = payload.message_key
+        if message_key:
+            exists_key = await self.db.scalar(select(Message).where(Message.message_key == message_key))
             if exists_key:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Duplicate message key")
+        else:
+            # 自动生成唯一 key
+            while True:
+                candidate = f"msg_{uuid.uuid4().hex}"
+                exists_key = await self.db.scalar(select(Message).where(Message.message_key == candidate))
+                if not exists_key:
+                    message_key = candidate
+                    break
 
         dispatch_mode = getattr(channel, "dispatch_mode", 0)
         target_user_ids: list[int] = payload.target_user_ids or []
@@ -78,7 +90,7 @@ class MessageService:
             app_id=payload.app_id,
             channel_id=payload.channel_id,
             message_type_id=payload.message_type_id,
-            message_key=payload.message_key,
+            message_key=message_key,
             title=payload.title,
             content=payload.content,
             payload=payload.payload,
@@ -151,7 +163,9 @@ class MessageService:
         message.published_at = datetime.utcnow()
         await self.db.commit()
         await self.db.refresh(message)
-        return MessageSendResponse(id=message.id, created_at=message.created_at, status=message.status)
+        return MessageSendResponse(
+            id=message.id, created_at=message.created_at, status=message.status, message_key=message.message_key
+        )
 
     async def list_messages(
         self, page: int, page_size: int, app_id: int | None = None, channel_id: int | None = None

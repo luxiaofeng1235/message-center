@@ -21,6 +21,7 @@ class MessageSendResponse(BaseModel):
     id: int
     created_at: datetime
     status: int
+    message_key: str | None = None
 
 
 class MessageOut(BaseModel):
