@@ -41,6 +41,16 @@
       <el-form-item label="MessageKey(可选)">
         <el-input v-model="form.message_key" />
       </el-form-item>
+      <el-form-item label="派发模式" prop="dispatch_mode">
+        <el-radio-group v-model="form.dispatch_mode">
+          <el-radio :label="0">订阅</el-radio>
+          <el-radio :label="1">单播/定向</el-radio>
+          <el-radio :label="2">广播</el-radio>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item v-if="form.dispatch_mode === 1" label="目标用户ID(逗号分隔)">
+        <el-input v-model="targetUsersStr" placeholder="如：1,2,3" />
+      </el-form-item>
       <el-form-item label="X-App-Secret" prop="app_secret">
         <el-input v-model="form.app_secret" />
       </el-form-item>
@@ -66,9 +76,11 @@ const form = reactive({
   content: '',
   priority: 0,
   message_key: '',
+  dispatch_mode: 0,
   app_secret: '',
 })
 const payloadStr = ref('')
+const targetUsersStr = ref('')
 const result = ref(null)
 const loading = ref(false)
 const formRef = ref()
@@ -77,6 +89,7 @@ const rules = {
   channel_id: [{ required: true, message: '请选择通道', trigger: 'change' }],
   message_type_id: [{ required: true, message: '请选择消息类型', trigger: 'change' }],
   content: [{ required: true, message: '请输入内容', trigger: 'blur' }],
+  dispatch_mode: [{ required: true, message: '请选择派发模式', trigger: 'change' }],
   app_secret: [{ required: true, message: '请输入X-App-Secret', trigger: 'blur' }],
 }
 
@@ -143,6 +156,16 @@ const send = async () => {
   try {
     await formRef.value.validate()
     const payload = { ...form, payload: payloadStr.value ? JSON.parse(payloadStr.value) : null }
+    if (form.dispatch_mode === 1) {
+      payload.target_user_ids = targetUsersStr.value
+        ? targetUsersStr.value
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean)
+            .map((n) => Number(n))
+            .filter((n) => !Number.isNaN(n))
+        : []
+    }
     const res = await sendMessage(payload, form.app_secret)
     result.value = res
     ElMessage.success('发送成功')
