@@ -87,6 +87,10 @@ class AdminService:
         return AdminOut.model_validate(admin, from_attributes=True)
 
     async def deactivate_admin(self, admin_id: int, current_admin: AdminUser) -> None:
+        result = await self.db.execute(select(AdminUser).where(AdminUser.id == admin_id))
+        target = result.scalar_one_or_none()
+        if not target:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Admin not found")
         if admin_id == current_admin.id:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="不能禁用自己")
         if not current_admin.is_super:

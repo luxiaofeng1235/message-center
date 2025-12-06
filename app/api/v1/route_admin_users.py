@@ -12,7 +12,9 @@ from app.api.deps import get_current_admin, get_db
 from app.schemas.admin import AdminCreate, AdminOut, AdminUpdate
 from app.schemas.common import Page
 from app.services.admin.admin_service import AdminService
-from app.core.response import success
+from fastapi import HTTPException
+
+from app.core.response import success, fail
 
 router = APIRouter(prefix="/admin/users")
 AVATAR_DIR = Path("public/avatar")
@@ -58,8 +60,12 @@ async def deactivate_admin(
     current_admin=Depends(get_current_admin),
 ) -> dict[str, str]:
     service = AdminService(db)
-    await service.deactivate_admin(admin_id, current_admin)
-    return success({"status": "ok"})
+    try:
+        await service.deactivate_admin(admin_id, current_admin)
+        return success({"status": "ok"})
+    except HTTPException as exc:
+        # 统一返回格式 code=0，便于前端识别
+        return fail(exc.detail or "操作失败", status_code=exc.status_code)
 
 
 @router.post("/avatar", response_model=None)
