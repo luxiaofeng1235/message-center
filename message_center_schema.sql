@@ -116,6 +116,8 @@ CREATE TABLE `mc_channel`  (
   `name` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '通道名称',
   `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '说明',
   `is_active` tinyint(1) NOT NULL DEFAULT 1 COMMENT '是否启用 1=是 0=否',
+  `dispatch_mode` tinyint(1) NOT NULL DEFAULT 0 COMMENT '投递模式：0=按订阅(默认)、1=广播在线用户、2=广播所有用户',
+  `broadcast_filter` json NULL COMMENT '广播过滤条件(JSON，可选)',
   `created_by` bigint UNSIGNED NULL DEFAULT NULL COMMENT '创建人 mc_admin_user.id',
   `updated_by` bigint UNSIGNED NULL DEFAULT NULL COMMENT '最后修改人 mc_admin_user.id',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -128,7 +130,7 @@ CREATE TABLE `mc_channel`  (
 -- ----------------------------
 -- Records of mc_channel
 -- ----------------------------
-INSERT INTO `mc_channel` VALUES (1, 1, 'news', '新闻', 'news channel', 1, NULL, NULL, '2025-12-05 08:54:40', '2025-12-05 08:54:40');
+INSERT INTO `mc_channel` VALUES (1, 1, 'news', '新闻', 'news channel', 1, 0, NULL, NULL, NULL, '2025-12-05 08:54:40', '2025-12-05 08:54:40');
 
 -- ----------------------------
 -- Table structure for mc_channel_message_type
