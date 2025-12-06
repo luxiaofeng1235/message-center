@@ -75,6 +75,7 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
             user_agent=websocket.headers.get("user-agent"),
             ip=websocket.client.host if websocket.client else None,
             connected_at=datetime.utcnow(),
+            last_active_at=datetime.utcnow(),
         )
         db.add(conn)
         await db.commit()
@@ -111,6 +112,18 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
             data = await websocket.receive_text()
             try:
                 payload = json.loads(data)
+                if isinstance(payload, dict):
+                    await db.execute(
+                        ClientConnection.__table__
+                        .update()
+                        .where(
+                            ClientConnection.user_id == uid,
+                            ClientConnection.instance_id == iid,
+                            ClientConnection.client_id == client_id,
+                        )
+                        .values(last_active_at=datetime.utcnow())
+                    )
+                    await db.commit()
                 # 简单心跳：收到 type=ping 或文本 "ping" 返回 "PONG"
                 if (isinstance(payload, dict) and payload.get("type") == "ping") or data.strip().lower() == "ping":
                     await websocket.send_text("PONG")
@@ -129,3 +142,15 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                 await websocket.send_text("invalid json")
     except WebSocketDisconnect:
         manager.disconnect(uid, websocket)
+        async with async_session() as db:
+            await db.execute(
+                ClientConnection.__table__
+                .update()
+                .where(
+                    ClientConnection.user_id == uid,
+                    ClientConnection.instance_id == iid,
+                    ClientConnection.client_id == client_id,
+                )
+                .values(disconnected_at=datetime.utcnow())
+            )
+            await db.commit()

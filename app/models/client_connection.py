@@ -18,4 +18,5 @@ class ClientConnection(Base):
     user_agent = Column(String(255))
     ip = Column(String(45))
     connected_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    last_active_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     disconnected_at = Column(DateTime)

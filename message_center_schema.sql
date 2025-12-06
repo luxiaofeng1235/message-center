@@ -172,6 +172,7 @@ CREATE TABLE `mc_client_connection`  (
   `user_agent` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT 'UA 信息',
   `ip` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '客户端IP',
   `connected_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '连接建立时间',
+  `last_active_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '最后活跃时间',
   `disconnected_at` timestamp NULL DEFAULT NULL COMMENT '连接关闭时间',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_mc_connection_user`(`user_id` ASC, `connected_at` ASC) USING BTREE
