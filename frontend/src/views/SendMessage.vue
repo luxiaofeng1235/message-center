@@ -56,7 +56,7 @@
 <script setup>
 import { reactive, ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { sendMessage, listApps, listChannels, listChannelMessageTypes } from '../api'
+import { sendMessage, listApps, listChannels, listChannelMessageTypes, listMessageTypesAll } from '../api'
 
 const form = reactive({
   app_id: null,
@@ -83,6 +83,7 @@ const rules = {
 const appOptions = ref([])
 const channelOptions = ref([])
 const messageTypeOptions = ref([])
+const messageTypeDict = ref({})
 
 const loadApps = async () => {
   const res = await listApps({ page: 1, page_size: 1000 })
@@ -106,10 +107,14 @@ const loadMessageTypes = async (channelId) => {
     return
   }
   const res = await listChannelMessageTypes({ page: 1, page_size: 1000, channel_id: channelId })
-  messageTypeOptions.value = (res.items || []).map((m) => ({
-    value: m.message_type_id,
-    label: `${m.message_type_name || ''} (ID:${m.message_type_id})`,
-  }))
+  messageTypeOptions.value = (res.items || []).map((m) => {
+    const mt = messageTypeDict.value[m.message_type_id]
+    const name = mt?.name || ''
+    return {
+      value: m.message_type_id,
+      label: `${name} (ID:${m.message_type_id})`,
+    }
+  })
 }
 
 const onAppChange = async (appId) => {
@@ -122,6 +127,15 @@ const onAppChange = async (appId) => {
 const onChannelChange = async (channelId) => {
   form.message_type_id = null
   await loadMessageTypes(channelId)
+}
+
+const loadMessageTypeDict = async () => {
+  const res = await listMessageTypesAll()
+  const dict = {}
+  for (const mt of res.items || []) {
+    dict[mt.id] = mt
+  }
+  messageTypeDict.value = dict
 }
 
 const send = async () => {
@@ -145,6 +159,6 @@ const send = async () => {
 }
 
 onMounted(async () => {
-  await loadApps()
+  await Promise.all([loadApps(), loadMessageTypeDict()])
 })
 </script>
