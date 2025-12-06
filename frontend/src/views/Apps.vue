@@ -36,9 +36,9 @@
           <el-input v-model="form.code" :disabled="!!form.id" />
         </el-form-item>
         <el-form-item label="密钥" prop="secret">
-          <div class="secret-row">
-            <el-input v-model="form.secret" />
-            <el-button size="small" @click="genSecret">生成</el-button>
+          <el-input v-model="form.secret" class="secret-input" />
+          <div class="secret-actions">
+            <el-button size="small" type="primary" plain @click="genSecret">生成 32 位随机密钥</el-button>
           </div>
         </el-form-item>
         <el-form-item label="说明">
@@ -137,11 +137,10 @@ onMounted(fetchData)
   margin-top: 12px;
   text-align: right;
 }
-.secret-row {
-  display: flex;
-  gap: 8px;
+.secret-input :deep(.el-input__inner) {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
 }
-.secret-row .el-input {
-  flex: 1;
+.secret-actions {
+  margin-top: 6px;
 }
 </style>
