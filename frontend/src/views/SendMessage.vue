@@ -41,9 +41,6 @@
       <el-form-item label="优先级">
         <el-input v-model.number="form.priority" />
       </el-form-item>
-      <el-form-item label="MessageKey(可选)">
-        <el-input v-model="form.message_key" />
-      </el-form-item>
       <el-form-item v-if="selectedChannelMode === 1" label="目标用户ID(逗号分隔)">
         <el-input v-model="targetUsersStr" placeholder="如：1,2,3" />
       </el-form-item>
@@ -71,7 +68,6 @@ const form = reactive({
   title: '',
   content: '',
   priority: 0,
-  message_key: '',
   app_secret: '',
 })
 const payloadStr = ref('')
