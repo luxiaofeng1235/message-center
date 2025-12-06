@@ -36,7 +36,10 @@
           <el-input v-model="form.code" :disabled="!!form.id" />
         </el-form-item>
         <el-form-item label="密钥" prop="secret">
-          <el-input v-model="form.secret" />
+          <div class="secret-row">
+            <el-input v-model="form.secret" />
+            <el-button size="small" @click="genSecret">生成</el-button>
+          </div>
         </el-form-item>
         <el-form-item label="说明">
           <el-input v-model="form.description" />
@@ -57,6 +60,7 @@
 import { reactive, ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { listApps, createApp, updateApp } from '../api'
+import { randomSecret } from '../utils/random'
 
 const items = ref([])
 const meta = reactive({ total: 0, page: 1, page_size: 20 })
@@ -109,6 +113,10 @@ const save = async () => {
   }
 }
 
+const genSecret = () => {
+  form.secret = randomSecret(32)
+}
+
 const toggleActive = async (row) => {
   await updateApp(row.id, { is_active: row.is_active })
 }
@@ -128,5 +136,12 @@ onMounted(fetchData)
 .mt {
   margin-top: 12px;
   text-align: right;
+}
+.secret-row {
+  display: flex;
+  gap: 8px;
+}
+.secret-row .el-input {
+  flex: 1;
 }
 </style>
