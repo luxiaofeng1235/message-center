@@ -44,18 +44,15 @@
         </el-form-item>
         <el-form-item label="头像">
           <el-upload
-            list-type="picture-card"
+            class="avatar-uploader"
             :action="uploadUrl"
             :headers="uploadHeaders"
-            :file-list="fileList"
-            :multiple="false"
-            :limit="2"
+            :show-file-list="false"
             :on-success="handleUploadSuccess"
             :on-error="handleUploadError"
-            :on-preview="handlePreview"
-            :on-remove="handleRemove"
           >
-            <el-icon><Plus /></el-icon>
+            <img v-if="form.avatar" :src="resolveAvatar(form.avatar)" class="avatar" @click.stop="previewAvatar" />
+            <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
           </el-upload>
           <el-dialog v-model="previewVisible" width="30%">
             <img :src="previewUrl" style="width: 100%" />
@@ -110,7 +107,6 @@ const form = reactive({
   is_super: false,
   is_active: true,
 })
-const fileList = ref([])
 const rules = {
   username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
   password: [
@@ -147,7 +143,6 @@ const openForm = (row = null) => {
   formRef.value?.clearValidate()
   if (row) {
     Object.assign(form, { ...row, password: '', old_password: '' })
-    fileList.value = row.avatar ? [{ name: 'avatar', url: resolveAvatar(row.avatar) }] : []
   } else {
     Object.assign(form, {
       id: null,
@@ -160,7 +155,6 @@ const openForm = (row = null) => {
       is_super: false,
       is_active: true,
     })
-    fileList.value = []
   }
 }
 
@@ -207,7 +201,6 @@ const resolveAvatar = (url) => {
 const handleUploadSuccess = (res) => {
   if (res?.code === 1 && res.data?.url) {
     form.avatar = res.data.url
-    fileList.value = [{ name: 'avatar', url: resolveAvatar(res.data.url) }]
     ElMessage.success('上传成功')
   } else {
     ElMessage.error(res?.msg || '上传失败')
@@ -218,13 +211,13 @@ const handleUploadError = (err) => {
 }
 const previewVisible = ref(false)
 const previewUrl = ref('')
-const handlePreview = (file) => {
-  previewUrl.value = file.url
+const previewAvatar = () => {
+  if (!form.avatar) return
+  previewUrl.value = resolveAvatar(form.avatar)
   previewVisible.value = true
 }
 const handleRemove = () => {
   form.avatar = ''
-  fileList.value = []
 }
 
 onMounted(fetchData)
@@ -237,5 +230,29 @@ onMounted(fetchData)
 .mt {
   margin-top: 12px;
   text-align: right;
+}
+.avatar-uploader .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.avatar-uploader .el-upload:hover {
+  border-color: #409eff;
+}
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 120px;
+  height: 120px;
+  line-height: 120px;
+  text-align: center;
+}
+.avatar {
+  width: 120px;
+  height: 120px;
+  display: block;
+  object-fit: cover;
 }
 </style>
