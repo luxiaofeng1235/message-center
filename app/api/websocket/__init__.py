@@ -12,6 +12,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.websocket.connection_manager import manager
 from app.db.session import async_session
 from app.models.client_connection import ClientConnection
+from app.models.channel import Channel
+from app.models.app import App
+from app.models.user import User
 from app.models.message import Message
 from app.models.message_delivery import MessageDelivery
 
@@ -28,14 +31,35 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
     user_id = websocket.query_params.get("user_id")
     client_id = websocket.query_params.get("client_id")
     instance_id = websocket.query_params.get("instance_id")
-    if not user_id or not instance_id:
-        await websocket.close()
+    app_id = websocket.query_params.get("app_id")
+    channel_id = websocket.query_params.get("channel_id")
+    try:
+        uid = int(user_id)
+        iid = int(instance_id)
+        aid = int(app_id)
+        cid = int(channel_id)
+    except (TypeError, ValueError):
+        await websocket.close(code=1008)
         return
-    uid = int(user_id)
-    iid = int(instance_id)
+    if not uid or not iid or not aid or not cid:
+        await websocket.close(code=1008)
+        return
     await manager.connect(uid, websocket)
 
     async with async_session() as db:  # type: AsyncSession
+        # 校验 App / Channel / User
+        app_obj = await db.get(App, aid)
+        if not app_obj or not app_obj.is_active:
+            await websocket.close(code=1008)
+            return
+        channel = await db.get(Channel, cid)
+        if not channel or not channel.is_active or channel.app_id != aid:
+            await websocket.close(code=1008)
+            return
+        user = await db.get(User, uid)
+        if not user or user.app_id != aid:
+            await websocket.close(code=1008)
+            return
         conn = ClientConnection(
             user_id=uid,
             instance_id=iid,
