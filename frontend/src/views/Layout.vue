@@ -9,12 +9,12 @@
         <el-menu-item index="/admin-user-roles">管理员角色绑定</el-menu-item>
         <el-menu-item index="/apps">业务系统</el-menu-item>
         <el-menu-item index="/channels">通道</el-menu-item>
-        <el-menu-item index="/message-types">消息类型</el-menu-item>
+        <el-menu-item index="/message-types">系统消息类型</el-menu-item>
         <el-menu-item index="/channel-message-types">通道消息类型</el-menu-item>
         <el-menu-item index="/templates">模板</el-menu-item>
         <el-menu-item index="/subscriptions">订阅</el-menu-item>
         <el-menu-item index="/users">业务用户</el-menu-item>
-        <el-menu-item index="/messages">消息列表</el-menu-item>
+        <el-menu-item index="/messages">历史消息</el-menu-item>
         <el-menu-item index="/deliveries">投递记录</el-menu-item>
         <el-menu-item index="/send-message">发送消息</el-menu-item>
         <el-menu-item index="/instances">实例心跳</el-menu-item>
