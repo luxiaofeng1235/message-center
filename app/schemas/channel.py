@@ -9,12 +9,16 @@ class ChannelCreate(BaseModel):
     name: str = Field(min_length=1)
     description: str | None = None
     is_active: bool = True
+    dispatch_mode: int = Field(default=0, ge=0, le=2, description="0=按订阅,1=广播在线,2=广播所有")
+    broadcast_filter: dict | None = None
 
 
 class ChannelUpdate(BaseModel):
     name: str | None = Field(default=None, min_length=1)
     description: str | None = None
     is_active: bool | None = None
+    dispatch_mode: int | None = Field(default=None, ge=0, le=2)
+    broadcast_filter: dict | None = None
 
 
 class ChannelOut(BaseModel):
@@ -24,6 +28,8 @@ class ChannelOut(BaseModel):
     name: str
     description: str | None = None
     is_active: bool
+    dispatch_mode: int
+    broadcast_filter: dict | None = None
     created_at: datetime | None = None
     updated_at: datetime | None = None
 

@@ -18,7 +18,7 @@ from app.models.message_delivery import MessageDelivery
 router = APIRouter()
 
 
-@router.websocket("/ws")
+@router.websocket("")
 async def websocket_endpoint(websocket: WebSocket) -> None:
     """
     处理客户端连接；要求 query 中包含 user_id，可选 client_id。
