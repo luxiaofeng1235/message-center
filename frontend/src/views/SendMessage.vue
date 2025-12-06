@@ -15,6 +15,9 @@
             :value="ch.value"
           />
         </el-select>
+        <div v-if="selectedChannelMode !== null" class="mode-hint">
+          模式：{{ modeLabel(selectedChannelMode) }}
+        </div>
       </el-form-item>
       <el-form-item label="消息类型" prop="message_type_id">
         <el-select v-model="form.message_type_id" placeholder="请选择" filterable clearable>
@@ -41,14 +44,7 @@
       <el-form-item label="MessageKey(可选)">
         <el-input v-model="form.message_key" />
       </el-form-item>
-      <el-form-item label="派发模式" prop="dispatch_mode">
-        <el-radio-group v-model="form.dispatch_mode">
-          <el-radio :label="0">订阅</el-radio>
-          <el-radio :label="1">单播/定向</el-radio>
-          <el-radio :label="2">广播</el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item v-if="form.dispatch_mode === 1" label="目标用户ID(逗号分隔)">
+      <el-form-item v-if="selectedChannelMode === 1" label="目标用户ID(逗号分隔)">
         <el-input v-model="targetUsersStr" placeholder="如：1,2,3" />
       </el-form-item>
       <el-form-item label="X-App-Secret" prop="app_secret">
@@ -76,7 +72,6 @@ const form = reactive({
   content: '',
   priority: 0,
   message_key: '',
-  dispatch_mode: 0,
   app_secret: '',
 })
 const payloadStr = ref('')
@@ -89,7 +84,6 @@ const rules = {
   channel_id: [{ required: true, message: '请选择通道', trigger: 'change' }],
   message_type_id: [{ required: true, message: '请选择消息类型', trigger: 'change' }],
   content: [{ required: true, message: '请输入内容', trigger: 'blur' }],
-  dispatch_mode: [{ required: true, message: '请选择派发模式', trigger: 'change' }],
   app_secret: [{ required: true, message: '请输入X-App-Secret', trigger: 'blur' }],
 }
 
@@ -97,6 +91,7 @@ const appOptions = ref([])
 const channelOptions = ref([])
 const messageTypeOptions = ref([])
 const messageTypeDict = ref({})
+const selectedChannelMode = ref(null)
 
 const loadApps = async () => {
   const res = await listApps({ page: 1, page_size: 1000 })
@@ -111,6 +106,7 @@ const loadChannels = async (appId) => {
   channelOptions.value = (res.items || []).map((c) => ({
     value: c.id,
     label: `${c.name || ''} (ID:${c.id})`,
+    mode: c.dispatch_mode,
   }))
 }
 
@@ -133,12 +129,15 @@ const loadMessageTypes = async (channelId) => {
 const onAppChange = async (appId) => {
   form.channel_id = null
   form.message_type_id = null
+  selectedChannelMode.value = null
   await loadChannels(appId)
   messageTypeOptions.value = []
 }
 
 const onChannelChange = async (channelId) => {
   form.message_type_id = null
+  const found = channelOptions.value.find((c) => c.value === channelId)
+  selectedChannelMode.value = found ? found.mode : null
   await loadMessageTypes(channelId)
 }
 
@@ -156,7 +155,7 @@ const send = async () => {
   try {
     await formRef.value.validate()
     const payload = { ...form, payload: payloadStr.value ? JSON.parse(payloadStr.value) : null }
-    if (form.dispatch_mode === 1) {
+    if (selectedChannelMode.value === 1) {
       payload.target_user_ids = targetUsersStr.value
         ? targetUsersStr.value
             .split(',')
@@ -184,4 +183,17 @@ const send = async () => {
 onMounted(async () => {
   await Promise.all([loadApps(), loadMessageTypeDict()])
 })
+
+const modeLabel = (mode) => {
+  if (mode === 1) return '单播/定向'
+  if (mode === 2) return '广播'
+  return '订阅'
+}
 </script>
+
+<style scoped>
+.mode-hint {
+  margin-top: 6px;
+  color: #666;
+}
+</style>

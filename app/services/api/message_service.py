@@ -69,10 +69,10 @@ class MessageService:
             if exists_key:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Duplicate message key")
 
-        dispatch_mode = payload.dispatch_mode if payload.dispatch_mode is not None else getattr(channel, "dispatch_mode", 0)
+        dispatch_mode = getattr(channel, "dispatch_mode", 0)
         target_user_ids: list[int] = payload.target_user_ids or []
         if dispatch_mode == 1 and not target_user_ids:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="target_user_ids required for single")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="target_user_ids required for single mode")
 
         message = Message(
             app_id=payload.app_id,
@@ -106,7 +106,7 @@ class MessageService:
                 )
             )
             user_ids = [row[0] for row in subs_result.all()]
-        # 广播模式（2）如需脱离订阅，可在此扩展，例如查询全部用户
+        # 广播模式（2）目前仍基于订阅用户，如需覆盖所有用户/在线用户，可在此扩展
 
         deliveries: list[MessageDelivery] = []
         for uid in user_ids:
