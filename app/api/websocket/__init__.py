@@ -37,7 +37,7 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
     收到 {"delivery_id": int, "status": int} 视为 ACK。
     """
 
-    user_id = websocket.query_params.get("user_id")
+    external_user_id = websocket.query_params.get("external_user_id")
     client_id = websocket.query_params.get("client_id")
     instance_id = websocket.query_params.get("instance_id")
     app_id = websocket.query_params.get("app_id")
@@ -45,14 +45,15 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
     token = websocket.query_params.get("token")
     role = websocket.query_params.get("role")
     try:
-        uid = int(user_id)
         iid = int(instance_id)
         aid = int(app_id)
         cid = int(channel_id)
     except (TypeError, ValueError):
         await websocket.close(code=1008)
         return
-    if not uid or not iid or not aid or not cid or not token:
+    # external_user_id 允许为空时用 token 代替
+    external_identity = external_user_id or token
+    if not external_identity or not iid or not aid or not cid or not token:
         await websocket.close(code=1008)
         return
 
@@ -74,11 +75,15 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
             await websocket.close(code=1008)
             return
 
-        # 校验 User
-        user = await db.get(User, uid)
-        if not user or user.app_id != aid:
-            await websocket.close(code=1008)
-            return
+        # 获取/创建内部用户（业务端无需传内部 user_id）
+        user = await db.scalar(
+            select(User).where(User.app_id == aid, User.external_user_id == external_identity)
+        )
+        if not user:
+            user = User(app_id=aid, external_user_id=external_identity, nickname=None)
+            db.add(user)
+            await db.flush()
+        uid = user.id
 
         # 订阅模式下，要求用户已订阅该通道
         if getattr(channel, "dispatch_mode", 0) == 0:
