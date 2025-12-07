@@ -18,7 +18,7 @@ async def login(payload: AdminLogin, request: Request, db: AsyncSession = Depend
         token = await service.login(payload.username, payload.password, request_ip=client_ip)
         return success(token)
     except HTTPException as exc:
-        return fail(exc.detail or "登录失败", status_code=200)
+        return fail(exc.detail or "登录失败", status_code=0)
 
 
 @router.get("/me", response_model=None)

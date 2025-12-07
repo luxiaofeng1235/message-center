@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter
 
-from app.api.admin import (
+from app.admin import (
     route_admin_apps,
     route_admin_auth,
     route_admin_channel_message_types,
