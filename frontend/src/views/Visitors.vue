@@ -7,17 +7,20 @@
             <el-option v-for="app in appOptions" :key="app.id" :label="app.name" :value="app.id" />
           </el-select>
         </el-form-item>
-        <el-form-item label="角色">
-          <el-select v-model="filters.role" clearable placeholder="全部">
-            <el-option label="admin" value="admin" />
-            <el-option label="visitor" value="visitor" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="时间范围">
-          <el-date-picker
-            v-model="filters.range"
-            type="datetimerange"
-            start-placeholder="开始时间"
+      <el-form-item label="角色">
+        <el-select v-model="filters.role" clearable placeholder="全部">
+          <el-option label="admin" value="admin" />
+          <el-option label="visitor" value="visitor" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="Token">
+        <el-input v-model="filters.token" placeholder="支持前缀匹配" clearable />
+      </el-form-item>
+      <el-form-item label="时间范围">
+        <el-date-picker
+          v-model="filters.range"
+          type="datetimerange"
+          start-placeholder="开始时间"
             end-placeholder="结束时间"
             value-format="YYYY-MM-DDTHH:mm:ssZ"
           />
@@ -71,7 +74,7 @@ const filters = ref({
 })
 
 const resetFilters = () => {
-  filters.value = { app_id: null, role: '', range: [], limit: 200 }
+  filters.value = { app_id: null, role: '', token: '', range: [], limit: 200 }
   fetchData()
 }
 
@@ -92,6 +95,7 @@ const fetchData = async () => {
     }
     if (filters.value.app_id) params.app_id = filters.value.app_id
     if (filters.value.role) params.role = filters.value.role
+    if (filters.value.token) params.token = filters.value.token
     if (filters.value.range && filters.value.range.length === 2) {
       params.start_time = filters.value.range[0]
       params.end_time = filters.value.range[1]
