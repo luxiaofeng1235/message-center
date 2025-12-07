@@ -74,4 +74,4 @@ export const sendMessage = (payload, appSecret) =>
 export const heartbeat = (payload) => api.post('/api/v1/instances/heartbeat', payload)
 
 // Visitors / connections
-export const listVisitors = (params) => api.get('/api/v1/visitors', { params })
+export const listVisitors = (params) => api.get('/api/v1/admin/visitors', { params })

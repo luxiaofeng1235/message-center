@@ -6,6 +6,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.api import deps  # noqa: F401  # side-effect imports for dependencies
 from app.api.v1 import router as api_router
+from app.admin import router as admin_router
 from app.api.websocket import router as ws_router
 from app.core.response import success
 
@@ -26,6 +27,9 @@ def create_app() -> FastAPI:
     @app.get("/")
     async def root():
         return success({"service": "Message Center", "status": "ok"})
+    # 后台路由（路径仍以 /api/v1/admin/... 结尾，单独目录聚合）
+    app.include_router(admin_router, prefix="/api/v1")
+    # 对外 API（业务/WS 相关）
     app.include_router(api_router, prefix="/api/v1")
     app.include_router(ws_router, prefix="/ws")
     return app

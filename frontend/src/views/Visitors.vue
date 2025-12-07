@@ -69,6 +69,7 @@ const appOptions = ref([])
 const filters = ref({
   app_id: null,
   role: '',
+  token: '',
   range: [],
   limit: 200,
 })

@@ -10,7 +10,7 @@ from app.core.response import success
 from app.schemas.client_connection import ClientConnectionOut
 from app.services.admin.visitor_service import VisitorService
 
-router = APIRouter(prefix="/visitors")
+router = APIRouter(prefix="/admin/visitors")
 
 
 @router.get("", response_model=None)
