@@ -1,3 +1,13 @@
+"""
+message.py
+
+主要功能：消息主表，记录消息体、派发模式、优先级与时间戳。
+------------------------------------------------------
+作者: 团队/姓名
+日期: 2025-12-06
+版本: 1.0.0
+"""
+
 from datetime import datetime
 
 from sqlalchemy import Column, DateTime, Integer, JSON, String, Text

@@ -1,5 +1,14 @@
-from datetime import datetime
+"""
+admin_user_role.py
 
+主要功能：后台用户与角色的关联关系模型。
+------------------------------------------------------
+作者: 团队/姓名
+日期: 2025-12-06
+版本: 1.0.0
+"""
+
+from datetime import datetime
 
 from sqlalchemy import Column, DateTime
 from sqlalchemy.dialects.mysql import BIGINT

@@ -1,3 +1,13 @@
+"""
+message_delivery.py
+
+主要功能：消息投递记录，跟踪消息发送/重试/确认状态。
+------------------------------------------------------
+作者: 团队/姓名
+日期: 2025-12-06
+版本: 1.0.0
+"""
+
 from datetime import datetime
 
 from sqlalchemy import Column, DateTime, Integer, String

@@ -1,3 +1,13 @@
+"""
+message_template.py
+
+主要功能：消息模板模型，定义标题/内容/结构化模板及默认状态。
+------------------------------------------------------
+作者: 团队/姓名
+日期: 2025-12-06
+版本: 1.0.0
+"""
+
 from datetime import datetime
 
 from sqlalchemy import Boolean, Column, DateTime, JSON, String, Text

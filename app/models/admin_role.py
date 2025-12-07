@@ -1,3 +1,13 @@
+"""
+admin_role.py
+
+主要功能：定义后台角色模型，记录角色名称与描述。
+------------------------------------------------------
+作者: 团队/姓名
+日期: 2025-12-06
+版本: 1.0.0
+"""
+
 from datetime import datetime
 
 from sqlalchemy import Column, DateTime, String

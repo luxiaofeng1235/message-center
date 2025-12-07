@@ -1,3 +1,13 @@
+"""
+instance.py
+
+主要功能：记录服务实例信息（host/pid/心跳/状态）。
+------------------------------------------------------
+作者: 团队/姓名
+日期: 2025-12-06
+版本: 1.0.0
+"""
+
 from datetime import datetime
 
 from sqlalchemy import Boolean, Column, DateTime, Integer, String

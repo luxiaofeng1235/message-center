@@ -1,3 +1,13 @@
+"""
+channel_message_type.py
+
+主要功能：定义通道与消息类型的关联配置，含默认类型与参数。
+------------------------------------------------------
+作者: 团队/姓名
+日期: 2025-12-06
+版本: 1.0.0
+"""
+
 from datetime import datetime
 
 from sqlalchemy import Boolean, Column, DateTime, JSON

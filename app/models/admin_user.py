@@ -1,3 +1,13 @@
+"""
+admin_user.py
+
+主要功能：定义后台管理员账户模型，包含登录信息和状态标记。
+------------------------------------------------------
+作者: 团队/姓名
+日期: 2025-12-06
+版本: 1.0.0
+"""
+
 from datetime import datetime
 
 from sqlalchemy import Boolean, Column, DateTime, String

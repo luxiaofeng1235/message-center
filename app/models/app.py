@@ -1,3 +1,13 @@
+"""
+app.py
+
+主要功能：定义业务系统（App）模型，包含密钥、模式及启用状态。
+------------------------------------------------------
+作者: 团队/姓名
+日期: 2025-12-06
+版本: 1.0.0
+"""
+
 from datetime import datetime
 
 from sqlalchemy import Boolean, Column, DateTime, String, Integer, JSON

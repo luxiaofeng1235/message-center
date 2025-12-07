@@ -1,3 +1,13 @@
+"""
+subscription.py
+
+主要功能：订阅关系模型，记录用户对通道/消息类型的订阅状态。
+------------------------------------------------------
+作者: 团队/姓名
+日期: 2025-12-06
+版本: 1.0.0
+"""
+
 from datetime import datetime
 
 from sqlalchemy import Boolean, Column, DateTime, Integer

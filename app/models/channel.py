@@ -1,3 +1,13 @@
+"""
+channel.py
+
+主要功能：定义消息通道（Channel）模型，含通道标识、投递模式与启用状态。
+------------------------------------------------------
+作者: 团队/姓名
+日期: 2025-12-06
+版本: 1.0.0
+"""
+
 from datetime import datetime
 
 from sqlalchemy import Boolean, Column, DateTime, JSON, String, Integer
