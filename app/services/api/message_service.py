@@ -82,9 +82,24 @@ class MessageService:
                     break
 
         dispatch_mode = getattr(channel, "dispatch_mode", 0)
-        target_user_ids: list[int] = payload.target_user_ids or []
-        if dispatch_mode == 1 and not target_user_ids:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="target_user_ids required for single mode")
+        target_user_ids_raw = payload.target_user_ids or []
+        target_user_ids: list[int] = []
+        if target_user_ids_raw:
+            try:
+                target_user_ids = [int(x) for x in target_user_ids_raw]
+            except (TypeError, ValueError):
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="target_user_ids must be int list")
+
+        if dispatch_mode == 1:
+            if not target_user_ids:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail="target_user_ids required for single mode"
+                )
+            # 去重并限制规模，避免爆量单播
+            target_user_ids = list(dict.fromkeys(target_user_ids))[:200]
+        else:
+            # 非单播场景忽略客户端传入的 target_user_ids
+            target_user_ids = []
 
         message = Message(
             app_id=payload.app_id,
