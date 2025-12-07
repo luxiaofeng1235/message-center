@@ -163,13 +163,8 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                     await websocket.close(code=1008)
                     break
 
-                try:
-                    payload = json.loads(data)
-                except json.JSONDecodeError:
-                    await websocket.send_text(json.dumps({"event": "error", "code": "invalid_json"}))
-                    continue
-
-                if isinstance(payload, dict):
+                # 原始 ping（非 JSON）
+                if data.strip().lower() == "ping":
                     await db.execute(
                         ClientConnection.__table__
                         .update()
@@ -181,6 +176,27 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                         .values(last_active_at=datetime.utcnow())
                     )
                     await db.commit()
+                    await websocket.send_text("PONG")
+                    continue
+
+                try:
+                    payload = json.loads(data)
+                except json.JSONDecodeError:
+                    await websocket.send_text(json.dumps({"event": "error", "code": "invalid_json"}))
+                    continue
+
+                # 更新活跃时间（无论是否业务消息/心跳）
+                await db.execute(
+                    ClientConnection.__table__
+                    .update()
+                    .where(
+                        ClientConnection.user_id == uid,
+                        ClientConnection.instance_id == iid,
+                        ClientConnection.client_id == client_id,
+                    )
+                    .values(last_active_at=datetime.utcnow())
+                )
+                await db.commit()
 
                 # 心跳处理
                 if (isinstance(payload, dict) and payload.get("type") == "ping") or (
