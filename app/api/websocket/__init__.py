@@ -95,18 +95,32 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
 
         await manager.connect(uid, websocket)
 
-        conn = ClientConnection(
-            user_id=uid,
-            instance_id=iid,
-            client_id=client_id,
-            role=role,
-            token=token,
-            user_agent=websocket.headers.get("user-agent"),
-            ip=websocket.client.host if websocket.client else None,
-            connected_at=datetime.utcnow(),
-            last_active_at=datetime.utcnow(),
-        )
-        db.add(conn)
+        # 单用户保持一条记录：如已存在则更新状态，否则插入
+        existing_conn = await db.scalar(select(ClientConnection).where(ClientConnection.user_id == uid))
+        now_ts = datetime.utcnow()
+        if existing_conn:
+            existing_conn.instance_id = iid
+            existing_conn.client_id = client_id
+            existing_conn.role = role
+            existing_conn.token = token
+            existing_conn.user_agent = websocket.headers.get("user-agent")
+            existing_conn.ip = websocket.client.host if websocket.client else None
+            existing_conn.connected_at = now_ts
+            existing_conn.last_active_at = now_ts
+            existing_conn.disconnected_at = None
+        else:
+            conn = ClientConnection(
+                user_id=uid,
+                instance_id=iid,
+                client_id=client_id,
+                role=role,
+                token=token,
+                user_agent=websocket.headers.get("user-agent"),
+                ip=websocket.client.host if websocket.client else None,
+                connected_at=now_ts,
+                last_active_at=now_ts,
+            )
+            db.add(conn)
         await db.commit()
 
         # 补发未送达/失败的投递
@@ -168,11 +182,7 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                     await db.execute(
                         ClientConnection.__table__
                         .update()
-                        .where(
-                            ClientConnection.user_id == uid,
-                            ClientConnection.instance_id == iid,
-                            ClientConnection.client_id == client_id,
-                        )
+                        .where(ClientConnection.user_id == uid)
                         .values(last_active_at=datetime.utcnow())
                     )
                     await db.commit()
@@ -189,11 +199,7 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                 await db.execute(
                     ClientConnection.__table__
                     .update()
-                    .where(
-                        ClientConnection.user_id == uid,
-                        ClientConnection.instance_id == iid,
-                        ClientConnection.client_id == client_id,
-                    )
+                    .where(ClientConnection.user_id == uid)
                     .values(last_active_at=datetime.utcnow())
                 )
                 await db.commit()
@@ -221,11 +227,7 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
             await db.execute(
                 ClientConnection.__table__
                 .update()
-                .where(
-                    ClientConnection.user_id == uid,
-                    ClientConnection.instance_id == iid,
-                    ClientConnection.client_id == client_id,
-                )
+                .where(ClientConnection.user_id == uid)
                 .values(disconnected_at=datetime.utcnow())
             )
             await db.commit()
