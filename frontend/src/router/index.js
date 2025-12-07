@@ -18,6 +18,7 @@ import Deliveries from '../views/Deliveries.vue'
 import Instances from '../views/Instances.vue'
 import WsTester from '../views/WsTester.vue'
 import SendMessage from '../views/SendMessage.vue'
+import Visitors from '../views/Visitors.vue'
 
 const routes = [
   { path: '/login', name: 'login', component: Login },
@@ -41,6 +42,7 @@ const routes = [
       { path: 'instances', name: 'instances', component: Instances },
       { path: 'ws-tester', name: 'ws-tester', component: WsTester },
       { path: 'send-message', name: 'send-message', component: SendMessage },
+      { path: 'visitors', name: 'visitors', component: Visitors },
     ],
   },
 ]

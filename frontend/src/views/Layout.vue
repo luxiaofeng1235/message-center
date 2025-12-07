@@ -17,6 +17,7 @@
         <el-menu-item index="/messages">历史消息</el-menu-item>
         <el-menu-item index="/deliveries">投递记录</el-menu-item>
         <el-menu-item index="/send-message">发送消息</el-menu-item>
+        <el-menu-item index="/visitors">访客/连接</el-menu-item>
         <el-menu-item index="/instances">实例心跳</el-menu-item>
         <el-menu-item index="/ws-tester">WS 测试</el-menu-item>
       </el-menu>
