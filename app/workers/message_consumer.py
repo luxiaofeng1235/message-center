@@ -49,7 +49,22 @@ async def handle_message(db: AsyncSession, raw: str) -> None:
     message = await db.get(Message, message_id)
     if not message:
         return
-    if dispatch_mode == 1:
+    if dispatch_mode == 2:
+        # 广播：直接推送给所有在线连接（不依赖投递表，不写入 ack）
+        await manager.broadcast(
+            json.dumps(
+                {
+                    "message_id": message.id,
+                    "channel_id": message.channel_id,
+                    "title": message.title,
+                    "content": message.content,
+                    "payload": message.payload,
+                    "dispatch_mode": dispatch_mode,
+                }
+            )
+        )
+        return
+    elif dispatch_mode == 1:
         target_list = target_user_ids
     else:
         target_list = user_ids

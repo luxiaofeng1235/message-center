@@ -28,6 +28,12 @@ class ConnectionManager:
         for connection in self.active_connections.get(user_id, []):
             await connection.send_text(message)
 
+    async def broadcast(self, message: str) -> None:
+        """向所有在线连接广播。"""
+        for conns in self.active_connections.values():
+            for ws in conns:
+                await ws.send_text(message)
+
     def is_online(self, user_id: int) -> bool:
         return user_id in self.active_connections and len(self.active_connections[user_id]) > 0
 

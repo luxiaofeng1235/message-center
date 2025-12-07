@@ -123,7 +123,7 @@ class MessageService:
         user_ids: list[int] = []
         if dispatch_mode == 1:
             user_ids = target_user_ids
-        else:
+        elif dispatch_mode == 0:
             subs_result = await self.db.execute(
                 select(Subscription.user_id).where(
                     and_(
@@ -134,21 +134,26 @@ class MessageService:
                 )
             )
             user_ids = [row[0] for row in subs_result.all()]
-        # 广播模式（2）目前仍基于订阅用户，如需覆盖所有用户/在线用户，可在此扩展
+        elif dispatch_mode == 2:
+            # 广播模式不写投递记录，交由消费端直接推送在线连接
+            user_ids = []
+        else:
+            user_ids = []
 
         deliveries: list[MessageDelivery] = []
-        for uid in user_ids:
-            deliveries.append(
-                MessageDelivery(
-                    message_id=message.id,
-                    user_id=uid,
-                    status=0,
-                    retry_count=0,
-                    created_at=datetime.utcnow(),
+        if dispatch_mode in (0, 1):
+            for uid in user_ids:
+                deliveries.append(
+                    MessageDelivery(
+                        message_id=message.id,
+                        user_id=uid,
+                        status=0,
+                        retry_count=0,
+                        created_at=datetime.utcnow(),
+                    )
                 )
-            )
-        if deliveries:
-            self.db.add_all(deliveries)
+            if deliveries:
+                self.db.add_all(deliveries)
 
         await self.db.commit()
         await self.db.refresh(message)
