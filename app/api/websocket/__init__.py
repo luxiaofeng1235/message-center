@@ -6,6 +6,7 @@ import asyncio
 import json
 from collections import deque
 from datetime import datetime
+import uuid
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from sqlalchemy import select
@@ -98,6 +99,9 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                 await websocket.close(code=1008)
                 return
 
+        # 自动生成 client_id（若未传）
+        client_id = client_id or f"cid_{uuid.uuid4().hex}"
+
         await manager.connect(uid, websocket)
 
         # 单用户保持一条记录：如已存在则更新状态，否则插入
@@ -158,7 +162,7 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
 
         rate_window: deque[float] = deque()
         try:
-            await websocket.send_text("connected")
+            await websocket.send_text(json.dumps({"event": "connected", "client_id": client_id}))
             while True:
                 try:
                     data = await asyncio.wait_for(websocket.receive_text(), timeout=HEARTBEAT_TIMEOUT)
