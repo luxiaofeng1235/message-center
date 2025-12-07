@@ -19,7 +19,6 @@ router = APIRouter(prefix="/visitors")
 async def list_visitors(
     app_id: int | None = None,
     role: str | None = None,
-    online: bool | None = None,
     start_time: datetime | None = None,
     end_time: datetime | None = None,
     limit: int = 500,
@@ -47,11 +46,6 @@ async def list_visitors(
         conditions.append(ClientConnection.connected_at >= start_time)
     if end_time:
         conditions.append(ClientConnection.connected_at <= end_time)
-    if online is True:
-        conditions.append(ClientConnection.disconnected_at.is_(None))
-    elif online is False:
-        conditions.append(ClientConnection.disconnected_at.is_not(None))
-
     if conditions:
         stmt = stmt.where(and_(*conditions))
 
