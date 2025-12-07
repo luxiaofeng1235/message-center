@@ -23,11 +23,17 @@ async def _send_delivery(db: AsyncSession, delivery: MessageDelivery, message: M
         delivery.user_id,
         json.dumps(
             {
+                "event": "message_delivery",
                 "delivery_id": delivery.id,
                 "message_id": message.id,
+                "message_key": message.message_key,
+                "channel_id": message.channel_id,
+                "dispatch_mode": message.dispatch_mode,
+                "sender_user_id": message.sender_user_id,
                 "title": message.title,
                 "content": message.content,
                 "payload": message.payload,
+                "created_at": message.created_at.isoformat() if message.created_at else None,
             }
         ),
     )
@@ -54,12 +60,18 @@ async def handle_message(db: AsyncSession, raw: str) -> None:
         await manager.broadcast(
             json.dumps(
                 {
+                    "event": "message_broadcast",
                     "message_id": message.id,
+                    "message_key": message.message_key,
                     "channel_id": message.channel_id,
+                    "app_id": message.app_id,
+                    "message_type_id": message.message_type_id,
+                    "sender_user_id": message.sender_user_id,
                     "title": message.title,
                     "content": message.content,
                     "payload": message.payload,
                     "dispatch_mode": dispatch_mode,
+                    "created_at": message.created_at.isoformat() if message.created_at else None,
                 }
             )
         )
