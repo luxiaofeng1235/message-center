@@ -1,3 +1,13 @@
+"""
+app_service.py
+
+主要功能：业务接入系统（App）管理与鉴权服务。
+------------------------------------------------------
+作者: 团队/姓名
+日期: 2025-12-06
+版本: 1.0.0
+"""
+
 from datetime import datetime
 from typing import Sequence
 

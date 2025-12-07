@@ -1,3 +1,13 @@
+"""
+auth_service.py
+
+主要功能：后台登录认证与访问令牌签发。
+------------------------------------------------------
+作者: 团队/姓名
+日期: 2025-12-06
+版本: 1.0.0
+"""
+
 from datetime import datetime, timedelta
 
 from app.core.config import get_settings

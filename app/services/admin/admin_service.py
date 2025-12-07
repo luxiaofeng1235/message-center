@@ -1,3 +1,13 @@
+"""
+admin_service.py
+
+主要功能：后台管理员服务，负责认证、权限与增删改查。
+------------------------------------------------------
+作者: 团队/姓名
+日期: 2025-12-06
+版本: 1.0.0
+"""
+
 from datetime import datetime
 from typing import Sequence
 
